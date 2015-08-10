@@ -7,31 +7,31 @@ $new_discovery_url="https://discovery.etcd.io/new?size=#{$num_instances}"
 # To automatically replace the discovery token on 'vagrant up', uncomment
 # the lines below:
 #
-#if File.exists?('user-data') && ARGV[0].eql?('up')
-#  require 'open-uri'
-#  require 'yaml'
-#
-#  token = open($new_discovery_url).read
-#
-#  data = YAML.load(IO.readlines('user-data')[1..-1].join)
-#  if data['coreos'].key? 'etcd'
-#    data['coreos']['etcd']['discovery'] = token
-#  end
-#  if data['coreos'].key? 'etcd2'
-#    data['coreos']['etcd2']['discovery'] = token
-#  end
-#
-#  # Fix for YAML.load() converting reboot-strategy from 'off' to `false`
-#  if data['coreos']['update'].key? 'reboot-strategy'
-#     if data['coreos']['update']['reboot-strategy'] == false
-#          data['coreos']['update']['reboot-strategy'] = 'off'
-#       end
-#  end
-#
-#  yaml = YAML.dump(data)
-#  File.open('user-data', 'w') { |file| file.write("#cloud-config\n\n#{yaml}") }
-#end
-#
+if File.exists?('user-data') && ARGV[0].eql?('up')
+  require 'open-uri'
+  require 'yaml'
+
+  token = open($new_discovery_url).read
+
+  data = YAML.load(IO.readlines('user-data')[1..-1].join)
+  if data['coreos'].key? 'etcd'
+    data['coreos']['etcd']['discovery'] = token
+  end
+  if data['coreos'].key? 'etcd2'
+    data['coreos']['etcd2']['discovery'] = token
+  end
+
+  # Fix for YAML.load() converting reboot-strategy from 'off' to `false`
+  # if data['coreos']['update'].key? 'reboot-strategy'
+  #    if data['coreos']['update']['reboot-strategy'] == false
+  #       data['coreos']['update']['reboot-strategy'] = 'off'
+  #    end
+  # end
+
+  yaml = YAML.dump(data)
+  File.open('user-data', 'w') { |file| file.write("#cloud-config\n\n#{yaml}") }
+end
+
 
 #
 # coreos-vagrant is configured through a series of configuration
@@ -66,7 +66,7 @@ $new_discovery_url="https://discovery.etcd.io/new?size=#{$num_instances}"
 # If 2375 is used, Vagrant will auto-increment (e.g. in the case of $num_instances > 1)
 # You can then use the docker tool locally by setting the following env var:
 #   export DOCKER_HOST='tcp://127.0.0.1:2375'
-#$expose_docker_tcp=2375
+$expose_docker_tcp=2375
 
 # Enable NFS sharing of your home directory ($HOME) to CoreOS
 # It will be mounted at the same path in the VM as on the host.
