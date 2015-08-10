@@ -1,0 +1,41 @@
+#cloud-config
+
+---
+write-files:
+- path: /etc/conf.d/nfs
+  permissions: '0644'
+  content: |
+    OPTS_RPC_MOUNTD=""
+- path: /opt/bin/wupiao
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    # [w]ait [u]ntil [p]ort [i]s [a]ctually [o]pen
+    [ -n "$1" ] && \
+      until curl -o /dev/null -sIf http://${1}; do \
+        sleep 1 && echo .;
+      done;
+    exit $?
+- path: /opt/bin/wupiaoport
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    # [w]ait [u]ntil [p]ort [i]s [a]ctually [o]pen
+    [ -n "$1" ] && [ -n "$2" ] && while ! curl --output /dev/null \
+      --silent --head --fail \
+      http://${1}:${2}; do sleep 1 && echo -n .; done;
+    exit $?
+hostname: master
+coreos:
+  etcd2:
+    name: master
+    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+    advertise-client-urls: http://$private_ipv4:2379,http://$private_ipv4:4001
+    listen-peer-urls: http://$private_ipv4:2380,http://$private_ipv4:7001
+    initial-advertise-peer-urls: http://$private_ipv4:2380
+    discovery: https://discovery.etcd.io/d20428c13b662392fb9f4db7b394b1a3
+  fleet:
+    metadata: role=master
+  update:
+    group: alpha
+    reboot-strategy: false
