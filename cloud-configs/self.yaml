@@ -25,6 +25,12 @@ write-files:
       --silent --head --fail \
       http://${1}:${2}; do sleep 1 && echo -n .; done;
     exit $?
+- path: /opt/bin/ws
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    # watch system
+    watch -n 1 systemctl status
 hostname: master
 coreos:
   etcd2:
@@ -32,7 +38,7 @@ coreos:
     initial-advertise-peer-urls: http://$private_ipv4:2380
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
     listen-peer-urls: http://$private_ipv4:2380,http://$private_ipv4:7001
-    discovery: https://discovery.etcd.io/3db9c8dc63be98bc242a2984232164e4
+    discovery: https://discovery.etcd.io/9478e8ee424930567e7ed6f649039bb4
   fleet:
     metadata: role=master
     public-ip: $public_ipv4
@@ -205,4 +211,17 @@ coreos:
       --healthz_port=10248
       Restart=always
       RestartSec=10
+  - name: kube-dev-kubectl.service
+    command: start
+    content: |
+      [Unit]
+      Description=Kubernetes Kubectl
+      Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 
+      [Service]
+      ExecStartPre=/usr/bin/curl -L -o /opt/bin/kubectl -z /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v0.19.3/bin/linux/amd64/kubectl
+      ExecStartPre=/usr/bin/chmod +x /opt/bin/kubectl
+      # wait for kubernetes master to be up and ready
+      ExecStart=/opt/bin/wupiaoport $private_ipv4 8080
+      RemainAfterExit=yes
+      Type=oneshot
