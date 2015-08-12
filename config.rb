@@ -8,7 +8,7 @@ $new_discovery_url="https://discovery.etcd.io/new?size=#{$num_instances}"
 # the lines below:
 #
 cloud_config_path = File.join(File.dirname(__FILE__), "cloud-configs/self.yaml")
-if File.exists?(cloud_config_path) && ARGV[0].eql?('up')
+if true && File.exists?(cloud_config_path) && ARGV[0].eql?('up')
   require 'open-uri'
   require 'yaml'
 
