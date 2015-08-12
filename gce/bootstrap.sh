@@ -3,7 +3,7 @@
 SCRIPT_DIR=`dirname $0`
 
 INSTANCE_NAME=kubemaster
-CLOUD_CONFIG=$(cd "$SCRIPT_DIR" ; cd .. ; pwd -P)/cloud-configs/self.yaml
+CLOUD_CONFIG=$(cd "$SCRIPT_DIR" ; cd .. ; pwd -P)/cloud_configs/self.yaml
 
 gcloud compute project-info remove-metadata --keys user-data
 gcloud compute project-info add-metadata --metadata-from-file user-data="$CLOUD_CONFIG"

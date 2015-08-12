@@ -7,7 +7,7 @@ $new_discovery_url="https://discovery.etcd.io/new?size=#{$num_instances}"
 # To automatically replace the discovery token on 'vagrant up', uncomment
 # the lines below:
 #
-cloud_config_path = File.join(File.dirname(__FILE__), "cloud-configs/self.yaml")
+cloud_config_path = File.join(File.dirname(__FILE__), "cloud_configs/self.yaml")
 if true && File.exists?(cloud_config_path) && ARGV[0].eql?('up')
   require 'open-uri'
   require 'yaml'
