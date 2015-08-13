@@ -16,31 +16,35 @@ write-files:
         sleep 1 && echo .;
       done;
     exit $?
+- path: /opt/bin/wupiaoport
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    # [w]ait [u]ntil [p]ort [i]s [a]ctually [o]pen
+    [ -n "$1" ] && [ -n "$2" ] && while ! curl --output /dev/null \
+      --silent --head --fail \
+      http://${1}:${2}; do sleep 1 && echo -n .; done;
+    exit $?
 - path: /opt/bin/ws
   permissions: '0755'
   content: |
     #!/bin/bash
+    # watch system
     watch -n 1 systemctl status
-- path: /opt/bin/wss
-  permissions: '0755'
-  content: |
-    #!/bin/bash
-    systemctl status
-hostname: kumaster
+hostname: master
 coreos:
   etcd2:
     name: kumaster
-    listen-peer-urls: http://$private_ipv4:2380
-    listen-client-urls: http://0.0.0.0:2379
-
+    advertise-client-urls: http://$public_ipv4:2379
     initial-advertise-peer-urls: http://$private_ipv4:2380
+    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+    listen-peer-urls: http://$private_ipv4:2380,http://$private_ipv4:7001
     initial-cluster: kumaster=http://$private_ipv4:2380
-    advertise-client-urls: http://$private_ipv4:2379
   fleet:
-    metadata: role=kumaster
-    public-ip: $private_ipv4
+    metadata: role=master
+    public-ip: $public_ipv4
   flannel:
-    interface: $private_ipv4
+    interface: $public_ipv4
   units:
   - name: etcd2.service
     command: start
@@ -57,6 +61,20 @@ coreos:
         ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.244.0.0/16", "Backend": {"Type": "vxlan"}}'
   - name: docker.service
     command: start
+  - name: docker-tcp.socket
+    command: start
+    enable: true
+    content: |
+      [Unit]
+      Description=Docker Socket for the API
+
+      [Socket]
+      ListenStream=2375
+      Service=docker.service
+      BindIPv6Only=both
+
+      [Install]
+      WantedBy=sockets.target
   - name: generate-serviceaccount-key.service
     command: start
     content: |
@@ -100,14 +118,18 @@ coreos:
       ExecStartPre=/usr/bin/chmod +x /opt/bin/kube-apiserver
       ExecStartPre=/opt/bin/wupiao 127.0.0.1:2379/v2/machines
       ExecStart=/opt/bin/kube-apiserver \
+      --service_account_key_file=/opt/bin/kube-serviceaccount.key \
+      --service_account_lookup=false \
+      --admission_control=NamespaceLifecycle,NamespaceAutoProvision,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota \
       --runtime_config=api/v1 \
       --allow_privileged=true \
       --insecure_bind_address=0.0.0.0 \
       --insecure_port=8080 \
       --kubelet_https=true \
+      --secure_port=6443 \
       --service-cluster-ip-range=10.100.0.0/16 \
       --etcd_servers=http://127.0.0.1:2379 \
-      --bind-address=${DEFAULT_IPV4} \
+      --public_address_override=${DEFAULT_IPV4} \
       --logtostderr=true
       Restart=always
       RestartSec=10
@@ -157,7 +179,7 @@ coreos:
       ExecStartPre=/usr/bin/curl -L -o /opt/bin/kube-proxy -z /opt/bin/kube-proxy https://storage.googleapis.com/kubernetes-release/release/v0.19.3/bin/linux/amd64/kube-proxy
       ExecStartPre=/usr/bin/chmod +x /opt/bin/kube-proxy
       # wait for kubernetes master to be up and ready
-      ExecStartPre=/opt/bin/wupiao $private_ipv4:8080
+      ExecStartPre=/opt/bin/wupiaoport $private_ipv4 8080
       ExecStart=/opt/bin/kube-proxy \
       --master=$private_ipv4:8080 \
       --logtostderr=true
@@ -177,7 +199,7 @@ coreos:
       ExecStartPre=/usr/bin/curl -L -o /opt/bin/kubelet -z /opt/bin/kubelet https://storage.googleapis.com/kubernetes-release/release/v0.19.3/bin/linux/amd64/kubelet
       ExecStartPre=/usr/bin/chmod +x /opt/bin/kubelet
       # wait for kubernetes master to be up and ready
-      ExecStartPre=/opt/bin/wupiao $private_ipv4:8080
+      ExecStartPre=/opt/bin/wupiaoport $private_ipv4 8080
       ExecStart=/opt/bin/kubelet \
       --address=0.0.0.0 \
       --port=10250 \
@@ -201,6 +223,6 @@ coreos:
       ExecStartPre=/usr/bin/curl -L -o /opt/bin/kubectl -z /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v0.19.3/bin/linux/amd64/kubectl
       ExecStartPre=/usr/bin/chmod +x /opt/bin/kubectl
       # wait for kubernetes master to be up and ready
-      ExecStart=/opt/bin/wupiao $private_ipv4:8080
+      ExecStart=/opt/bin/wupiaoport $private_ipv4 8080
       RemainAfterExit=yes
       Type=oneshot
