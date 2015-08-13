@@ -7,8 +7,7 @@
 	    "name": "heapster",
 	    "version": "v6"
 	},
-	"name": "heapster",
-	"namespace": "kube-system"
+	"name": "heapster"
     },
     "spec": {
 	"replicas": 1,
@@ -30,7 +29,7 @@
 			"name": "heapster",
 			"command": [
 			    "/heapster",
-			    "--source=kubernetes:https://kubernetes",
+			    "--source=kubernetes",
 			    "--sink=influxdb:http://monitoring-influxdb:8086"
 			]
 		    }

@@ -5,8 +5,7 @@
 	"labels": {
 	    "name": "influxGrafana"
 	},
-	"name": "infludb-grafana",
-	"namespace": "kube-system"
+	"name": "infludb-grafana"
     },
     "spec": {
 	"replicas": 1,

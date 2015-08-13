@@ -6,8 +6,7 @@
 	    "kubernetes.io/name": "monitoring-grafana",
 	    "kubernetes.io/cluster-service": "true"
 	},
-	"name": "monitoring-grafana",
-	"namespace": "kube-system"
+	"name": "monitoring-grafana"
     },
     "spec": {
 	"type": "LoadBalancer",

@@ -64,7 +64,7 @@ $update_channel='stable'
 # If 2375 is used, Vagrant will auto-increment (e.g. in the case of $num_instances > 1)
 # You can then use the docker tool locally by setting the following env var:
 #   export DOCKER_HOST='tcp://127.0.0.1:2375'
-$expose_docker_tcp=2375
+# $expose_docker_tcp=2375
 
 # Enable NFS sharing of your home directory ($HOME) to CoreOS
 # It will be mounted at the same path in the VM as on the host.
@@ -85,3 +85,4 @@ $expose_docker_tcp=2375
 
 # Enable port forwarding from guest(s) to host machine, syntax is: { 80 => 8080 }, auto correction is enabled by default.
 #$forwarded_ports = {}
+$forwarded_ports = { 8080 => 8080 }

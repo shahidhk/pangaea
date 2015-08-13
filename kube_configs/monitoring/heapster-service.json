@@ -6,8 +6,7 @@
 	    "kubernetes.io/cluster-service": "true",
 	    "kubernetes.io/name": "Heapster"
 	},
-	"name": "heapster",
-	"namespace": "kube-system"
+	"name": "heapster"
     },
     "spec": {
 	"ports": [
