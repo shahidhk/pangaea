@@ -4,11 +4,10 @@ $num_instances=1
 # Used to fetch a new discovery token for a cluster of size $num_instances
 $new_discovery_url="https://discovery.etcd.io/new?size=#{$num_instances}"
 
-# To automatically replace the discovery token on 'vagrant up', uncomment
-# the lines below:
+# Automatically replace the discovery token on 'vagrant up'
 #
 cloud_config_path = File.join(File.dirname(__FILE__), "cloud_configs/self.yaml")
-if true && File.exists?(cloud_config_path) && ARGV[0].eql?('up')
+if false && File.exists?(cloud_config_path) && ARGV[0].eql?('up')
   require 'open-uri'
   require 'yaml'
 
@@ -29,14 +28,6 @@ if true && File.exists?(cloud_config_path) && ARGV[0].eql?('up')
   yaml = YAML.dump(data)
   File.open(cloud_config_path, 'w') { |file| file.write("#cloud-config\n\n#{yaml}") }
 end
-
-
-#
-# coreos-vagrant is configured through a series of configuration
-# options (global ruby variables) which are detailed below. To modify
-# these options, first copy this file to "config.rb". Then simply
-# uncomment the necessary lines, leaving the $, and replace everything
-# after the equals sign..
 
 # Change basename of the VM
 # The default value is "core", which results in VMs named starting with
@@ -64,7 +55,7 @@ $update_channel='stable'
 # If 2375 is used, Vagrant will auto-increment (e.g. in the case of $num_instances > 1)
 # You can then use the docker tool locally by setting the following env var:
 #   export DOCKER_HOST='tcp://127.0.0.1:2375'
-$expose_docker_tcp=2375
+#$expose_docker_tcp=2375
 
 # Enable NFS sharing of your home directory ($HOME) to CoreOS
 # It will be mounted at the same path in the VM as on the host.
