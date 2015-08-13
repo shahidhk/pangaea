@@ -28,9 +28,9 @@
 			"image": "kubernetes/heapster:v0.17.0",
 			"name": "heapster",
 			"command": [
-			    "/heapster",
-			    "--source=kubernetes",
-			    "--sink=influxdb:http://monitoring-influxdb:8086"
+			    "/bin/sh",
+			    "-c",
+			    "/heapster --source=kubernetes --sink=influxdb:http://$MONITORING_INFLUXDB_SERVICE_HOST:$MONITORING_INFLUXDB_SERVICE_PORT_API"
 			]
 		    }
 		]
@@ -38,3 +38,4 @@
 	}
     }
 }
+
