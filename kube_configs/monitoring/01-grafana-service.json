@@ -9,7 +9,7 @@
 	"name": "monitoring-grafana"
     },
     "spec": {
-	"type": "LoadBalancer",
+	"type": "NodePort",
 	"ports": [
 	    {
 		"port": 80,
