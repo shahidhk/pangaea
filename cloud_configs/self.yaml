@@ -100,6 +100,9 @@ coreos:
       ExecStartPre=/usr/bin/chmod +x /opt/bin/kube-apiserver
       ExecStartPre=/opt/bin/wupiao 127.0.0.1:2379/v2/machines
       ExecStart=/opt/bin/kube-apiserver \
+      --service_account_key_file=/opt/bin/kube-serviceaccount.key \
+      --service_account_lookup=false \
+      --admission_control=NamespaceLifecycle,NamespaceAutoProvision,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota \
       --runtime_config=api/v1 \
       --allow_privileged=true \
       --insecure_bind_address=0.0.0.0 \
@@ -185,7 +188,6 @@ coreos:
       --api_servers=$private_ipv4:8080 \
       --allow_privileged=true \
       --logtostderr=true \
-      --cadvisor_port=4194 \
       --healthz_bind_address=0.0.0.0 \
       --healthz_port=10248
       Restart=always

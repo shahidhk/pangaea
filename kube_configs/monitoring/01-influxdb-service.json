@@ -6,6 +6,7 @@
 	"name": "monitoring-influxdb"
     },
     "spec": {
+	"type": "NodePort",
 	"ports": [
 	    {
 		"name": "http",
