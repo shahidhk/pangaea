@@ -31,7 +31,7 @@
 			"command": [
 			    "/bin/sh",
 			    "-c",
-			    "/heapster --v=4 --vmodule=*=5 --source=\"kubernetes:https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}?useServiceAccount=true&insecure=true&auth=&kubeletPort=10255\" --sink=\"influxdb:http://${MONITORING_INFLUXDB_SERVICE_HOST}:${MONITORING_INFLUXDB_SERVICE_PORT_API}\""
+			    "/heapster --v=4 --vmodule=*=5 --source=\"kubernetes:https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}?useServiceAccount=true&auth=&kubeletPort=10255\" --sink=\"influxdb:http://${MONITORING_INFLUXDB_SERVICE_HOST}:${MONITORING_INFLUXDB_SERVICE_PORT_API}\""
 			],
 			"ports": [
 			    {

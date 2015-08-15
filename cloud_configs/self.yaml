@@ -99,9 +99,9 @@ coreos:
       ExecStartPre=-/usr/bin/mkdir -p /opt/credentials
       ExecStartPre=/usr/bin/curl -L -o /opt/credentials/make-ca-cert.sh https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/saltbase/salt/generate-cert/make-ca-cert.sh
       ExecStartPre=/usr/bin/chmod +x /opt/credentials/make-ca-cert.sh
-      ExecStart=/opt/credentials/make-ca-cert.sh \
+      ExecStart=/bin/sh -c '/opt/credentials/make-ca-cert.sh \
         $(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip || echo $DEFAULT_IPV4) \
-        IP:10.0.0.1,IP:$(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip || echo $ETH1_IPV4)
+        IP:10.100.0.1,IP:$(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip || echo $ETH1_IPV4)'
       RemainAfterExit=yes
       Type=oneshot
   - name: kube-apiserver.service
@@ -130,11 +130,9 @@ coreos:
       --etcd_servers=http://127.0.0.1:2379 \
       --bind-address=${DEFAULT_IPV4} \
       --logtostderr=true \
-
       --client-ca-file=/srv/kubernetes/ca.crt \
       --tls-cert-file=/srv/kubernetes/server.cert \
       --tls-private-key-file=/srv/kubernetes/server.key \
-      --token-auth-file=/srv/kubernetes/known_tokens.csv \
       --admission_control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota
       Restart=always
       RestartSec=10
