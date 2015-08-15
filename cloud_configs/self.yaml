@@ -84,14 +84,34 @@ coreos:
       ExecStart=/opt/bin/setup-network-environment
       RemainAfterExit=yes
       Type=oneshot
+  - name: generate-credentials.service
+    command: start
+    content: |
+      [Unit]
+      Description=Generate all relevant credentials
+      Documentation=https://github.com/kubernetes/kubernetes/blob/master/cluster/saltbase/salt/generate-cert/make-ca-cert.sh
+      Requires=setup-network-environment.service
+      After=setup-network-environment.service
+
+      [Service]
+      Environment="CERT_GROUP=root"
+      EnvironmentFile=/etc/network-environment
+      ExecStartPre=-/usr/bin/mkdir -p /opt/credentials
+      ExecStartPre=/usr/bin/curl -L -o /opt/credentials/make-ca-cert.sh https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/saltbase/salt/generate-cert/make-ca-cert.sh
+      ExecStartPre=/usr/bin/chmod +x /opt/credentials/make-ca-cert.sh
+      ExecStart=/opt/credentials/make-ca-cert.sh \
+        $(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip || echo $DEFAULT_IPV4) \
+        IP:10.0.0.1,IP:$(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip || echo $ETH1_IPV4)
+      RemainAfterExit=yes
+      Type=oneshot
   - name: kube-apiserver.service
     command: start
     content: |
       [Unit]
       Description=Kubernetes API Server
       Documentation=https://github.com/GoogleCloudPlatform/kubernetes
-      Requires=setup-network-environment.service etcd2.service generate-serviceaccount-key.service
-      After=setup-network-environment.service etcd2.service generate-serviceaccount-key.service
+      Requires=setup-network-environment.service etcd2.service generate-credentials.service
+      After=setup-network-environment.service etcd2.service generate-credentials.service
 
       [Service]
       EnvironmentFile=/etc/network-environment
@@ -100,9 +120,6 @@ coreos:
       ExecStartPre=/usr/bin/chmod +x /opt/bin/kube-apiserver
       ExecStartPre=/opt/bin/wupiao 127.0.0.1:2379/v2/machines
       ExecStart=/opt/bin/kube-apiserver \
-      --service_account_key_file=/opt/bin/kube-serviceaccount.key \
-      --service_account_lookup=false \
-      --admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota \
       --runtime_config=api/v1 \
       --allow_privileged=true \
       --insecure_bind_address=0.0.0.0 \
@@ -112,7 +129,13 @@ coreos:
       --service-cluster-ip-range=10.100.0.0/16 \
       --etcd_servers=http://127.0.0.1:2379 \
       --bind-address=${DEFAULT_IPV4} \
-      --logtostderr=true
+      --logtostderr=true \
+
+      --client-ca-file=/srv/kubernetes/ca.crt \
+      --tls-cert-file=/srv/kubernetes/server.cert \
+      --tls-private-key-file=/srv/kubernetes/server.key \
+      --token-auth-file=/srv/kubernetes/known_tokens.csv \
+      --admission_control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota
       Restart=always
       RestartSec=10
   - name: kube-controller-manager.service
@@ -121,16 +144,17 @@ coreos:
       [Unit]
       Description=Kubernetes Controller Manager
       Documentation=https://github.com/GoogleCloudPlatform/kubernetes
-      Requires=kube-apiserver.service
-      After=kube-apiserver.service
+      Requires=kube-apiserver.service generate-credentials.service
+      After=kube-apiserver.service generate-credentials.service
 
       [Service]
       ExecStartPre=/usr/bin/curl -L -o /opt/bin/kube-controller-manager -z /opt/bin/kube-controller-manager https://storage.googleapis.com/kubernetes-release/release/v1.0.3/bin/linux/amd64/kube-controller-manager
       ExecStartPre=/usr/bin/chmod +x /opt/bin/kube-controller-manager
       ExecStart=/opt/bin/kube-controller-manager \
-      --service_account_private_key_file=/opt/bin/kube-serviceaccount.key \
       --master=127.0.0.1:8080 \
-      --logtostderr=true
+      --logtostderr=true \
+      --root-ca-file=/srv/kubernetes/ca.crt \
+      --service-account-private-key-file=/srv/kubernetes/server.key
       Restart=always
       RestartSec=10
   - name: kube-scheduler.service
