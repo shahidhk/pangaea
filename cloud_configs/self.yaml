@@ -104,6 +104,7 @@ coreos:
       --allow_privileged=true \
       --insecure_bind_address=0.0.0.0 \
       --insecure_port=8080 \
+      --secure_port=6443 \
       --kubelet_https=true \
       --service-cluster-ip-range=10.100.0.0/16 \
       --etcd_servers=http://127.0.0.1:2379 \
