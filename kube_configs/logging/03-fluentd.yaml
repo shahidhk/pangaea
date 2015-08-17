@@ -12,12 +12,14 @@ spec:
         cpu: 100m
     env:
     - name: "FLUENTD_ARGS"
-      value: "-qq"
+      value: "-vv"
     volumeMounts:
     - name: varlog
       mountPath: /varlog
     - name: containers
       mountPath: /var/lib/docker/containers
+    - name: config-file
+      mountPath: /etc/td-agent/td-agent.conf
   volumes:
   - name: varlog
     hostPath:
@@ -25,4 +27,7 @@ spec:
   - name: containers
     hostPath:
       path: /var/lib/docker/containers
+  - name: config-file
+    hostPath:
+      path: /opt/custom/fluentd.conf
 

@@ -1,31 +1,6 @@
 #cloud-config
 
 ---
-write-files:
-- path: /etc/conf.d/nfs
-  permissions: '0644'
-  content: |
-    OPTS_RPC_MOUNTD=""
-- path: /opt/bin/wupiao
-  permissions: '0755'
-  content: |
-    #!/bin/bash
-    # [w]ait [u]ntil [p]ort [i]s [a]ctually [o]pen
-    [ -n "$1" ] && \
-      until curl -o /dev/null -sIf http://${1}; do \
-        sleep 1 && echo .;
-      done;
-    exit $?
-- path: /opt/bin/ws
-  permissions: '0755'
-  content: |
-    #!/bin/bash
-    watch -n 1 systemctl status
-- path: /opt/bin/wss
-  permissions: '0755'
-  content: |
-    #!/bin/bash
-    systemctl status
 hostname: kumaster
 coreos:
   etcd2:
@@ -229,3 +204,137 @@ coreos:
       ExecStart=/opt/bin/wupiao $private_ipv4:8080
       RemainAfterExit=yes
       Type=oneshot
+write-files:
+- path: /etc/conf.d/nfs
+  permissions: '0644'
+  content: |
+    OPTS_RPC_MOUNTD=""
+- path: /opt/bin/wupiao
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    # [w]ait [u]ntil [p]ort [i]s [a]ctually [o]pen
+    [ -n "$1" ] && \
+      until curl -o /dev/null -sIf http://${1}; do \
+        sleep 1 && echo .;
+      done;
+    exit $?
+- path: /opt/bin/ws
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    watch -n 1 systemctl status
+- path: /opt/bin/wss
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    systemctl status
+- path: /opt/custom/fluentd.conf
+  permissions: '0644'
+  content: |
+    <source>
+      type tail
+      format json
+      time_key time
+      path /varlog/containers/*.log
+      pos_file /varlog/es-containers.log.pos
+      time_format %Y-%m-%dT%H:%M:%S
+      tag reform.*
+      read_from_head true
+    </source>
+
+    <match reform.**>
+      type record_reformer
+      enable_ruby true
+      tag kubernetes.${tag_suffix[3].split('-')[0..-2].join('-')}
+    </match>
+
+    <source>
+      type tail
+      format none
+      path /varlog/monit.log
+      pos_file /varlog/gcp-monit.log.pos
+      tag monit
+    </source>
+
+    <source>
+      type tail
+      format none
+      path /varlog/salt/minion
+      pos_file /varlog/gcp-salt.pos
+      tag salt
+    </source>
+
+    <source>
+      type tail
+      format none
+      path /varlog/startupscript.log
+      pos_file /varlog/es-startupscript.log.pos
+      tag startupscript
+    </source>
+
+    <source>
+      type tail
+      format none
+      path /varlog/docker.log
+      pos_file /varlog/es-docker.log.pos
+      tag docker
+    </source>
+
+    <source>
+      type tail
+      format none
+      path /varlog/etcd.log
+      pos_file /varlog/es-etcd.log.pos
+      tag etcd
+    </source>
+
+    <source>
+      type tail
+      format none
+      path /varlog/kubelet.log
+      pos_file /varlog/es-kubelet.log.pos
+      tag kubelet
+    </source>
+
+    <source>
+      type tail
+      format none
+      path /varlog/kube-apiserver.log
+      pos_file /varlog/es-kube-apiserver.log.pos
+      tag kube-apiserver
+    </source>
+
+    <source>
+      type tail
+      format none
+      path /varlog/kube-controller-manager.log
+      pos_file /varlog/es-kube-controller-manager.log.pos
+      tag kube-controller-manager
+    </source>
+
+    <source>
+      type tail
+      format none
+      path /varlog/kube-scheduler.log
+      pos_file /varlog/es-kube-scheduler.log.pos
+      tag kube-scheduler
+    </source>
+
+    <match **>
+       type elasticsearch
+       log_level info
+       include_tag_key true
+       host "#{ENV['ELASTICSEARCH_LOGGING_SERVICE_HOST']}"
+       port 9200
+       logstash_format true
+       # Set the chunk limit the same as for fluentd-gcp.
+       buffer_chunk_limit 512K
+       # Cap buffer memory usage to 512KB/chunk * 128 chunks = 65 MB
+       buffer_queue_limit 128
+       flush_interval 5s
+       # Never wait longer than 2 minutes between retries.
+       max_retry_wait 120
+       # Disable the limit on the number of retries (retry forever).
+       disable_retry_limit
+    </match>

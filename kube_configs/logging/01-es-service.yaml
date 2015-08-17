@@ -8,6 +8,7 @@ metadata:
     kubernetes.io/cluster-service: "true"
     kubernetes.io/name: "Elasticsearch"
 spec:
+  type: NodePort
   ports:
   - port: 9200
     protocol: TCP

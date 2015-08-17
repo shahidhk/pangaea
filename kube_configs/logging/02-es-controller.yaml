@@ -8,7 +8,7 @@ metadata:
     version: v1
     kubernetes.io/cluster-service: "true"
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     k8s-app: elasticsearch-logging
     version: v1
