@@ -1,33 +1,48 @@
 apiVersion: v1
-kind: Pod
+kind: ReplicationController
 metadata:
-  name: fluentd-elasticsearch
+  name: fluentd-elasticsearch-v1
   namespace: kube-system
+  labels:
+    k8s-app: fluentd-elasticsearch
+    version: v1
+    kubernetes.io/cluster-service: "true"
 spec:
-  containers:
-  - name: fluentd-elasticsearch
-    image: gcr.io/google_containers/fluentd-elasticsearch:1.8
-    resources:
-      limits:
-        cpu: 100m
-    env:
-    - name: "FLUENTD_ARGS"
-      value: "-vv"
-    volumeMounts:
-    - name: varlog
-      mountPath: /varlog
-    - name: containers
-      mountPath: /var/lib/docker/containers
-    - name: config-file
-      mountPath: /etc/td-agent/td-agent.conf
-  volumes:
-  - name: varlog
-    hostPath:
-      path: /var/log
-  - name: containers
-    hostPath:
-      path: /var/lib/docker/containers
-  - name: config-file
-    hostPath:
-      path: /opt/custom/fluentd.conf
+  replicas: 1
+  selector:
+    k8s-app: fluentd-elasticsearch
+    version: v1
+  template:
+    metadata:
+      labels:
+        k8s-app: fluentd-elasticsearch
+        version: v1
+        kubernetes.io/cluster-service: "true"
+    spec:
+      containers:
+      - name: fluentd-elasticsearch
+        image: gcr.io/google_containers/fluentd-elasticsearch:1.8
+        resources:
+          limits:
+            cpu: 100m
+        env:
+        - name: "FLUENTD_ARGS"
+          value: "-vv"
+        volumeMounts:
+        - name: varlog
+          mountPath: /varlog
+        - name: containers
+          mountPath: /var/lib/docker/containers
+        - name: config-file
+          mountPath: /etc/td-agent/td-agent.conf
+      volumes:
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: containers
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: config-file
+        hostPath:
+          path: /opt/custom/fluentd.conf
 
