@@ -5,3 +5,5 @@ The default user name and password is 'admin'.
 Once you login to Grafana, add a datasource that is InfluxDB.
 InfluxDB version 0.8.x.
 The URL for InfluxDB will be http://:8086. Database name is 'k8s'. Default user name and password is 'root'.
+
+Import new dashboard from grafana_dashboard.json
