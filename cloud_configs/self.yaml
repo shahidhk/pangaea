@@ -32,6 +32,26 @@ coreos:
         ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.244.0.0/16", "Backend": {"Type": "vxlan"}}'
   - name: docker.service
     command: start
+  - name: docker-credentials.service
+    content: |
+      [Unit]
+      Description=Updates .dockercfg file with gcr credentials
+      Requires=docker.service
+      After=docker.service
+
+      [Service]
+      Type=oneshot
+      ExecStartPre=/bin/touch /root/.dockercfg
+      ExecStart=/usr/bin/docker run --rm -v=/app/credentials/auth-file.json:/token/auth-file.json -v=/root/.dockercfg:/token/.dockercfg --name=google_jwt_token tfcross/google-jwt-gcr-token-docker
+      ExecStop=/bin/bash -c "/usr/bin/docker stop -t 2 google_jwt_token && /usr/bin/docker rm -f google_jwt_token || true"
+  - name: docker-credentials.timer
+    command: start
+    content: |
+      [Unit]
+      Description=Run gcr credential updater every 50 minutes
+
+      [Timer]
+      OnCalendar=*:0/50
   - name: generate-serviceaccount-key.service
     command: start
     content: |
@@ -229,6 +249,10 @@ write-files:
   content: |
     #!/bin/bash
     systemctl status
+- path: /app/credentials/auth-file.json
+  permissions: '0644'
+  content: |
+    { "private_key_id": "26ed654d33b78df23782f81f27c6dffa35cf4f3c", "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC4cUdGMmWtEVx5\nC8jA6JaPSqqTkLpS4DOLA554jmddX7hTJciV68OIJob9AXXU/qC0i1rW8KMVjPKm\nQnD+Lzi2l3G/eVR9n74pU+VV8ahoaAI/Sf5vPcviQaWaqOTaQLHhKanJyd2Rsqt/\nwhUhj7B3aywubR/Fih502PI9zLUCiPIW+60dZJp+kCsOevOIs8A469ckw0VMfkZX\nVqG+Q5Au+xeCP6sKQtoTTm2f84vyzWfgrW1gU0xX+72e0pWzmDejKNXFSp+gnzJb\nlAuQ6H4eHulY/jv1iEqsnurbYz0NoaQuiyak/D8Z27orKd7S4rRH8bEcxY3e5KUh\nqdKL9qfhAgMBAAECggEBAKyfUJ7RYjn1ar/bmJt71BXuQvFzXf9c2MC9tV6NoQ5S\nHPis/yvZiZpuvJ4k9LxRR+VSG8XZWDk+Pof+3TP4zDKQUSRskPg2Psr9O0IRt5Vn\n6tqDDT/d7WkoGa9DbVUbgaAD12YFqXrIZxxecFqF2hoaUzJsbXT7jP+9YBMY+TyR\nh+mfC7f5lItyhJxLwoBOrlabj8NWox2wNsy310hhqXnTn84WqfaoaQKVEP+1kh+p\nY7oWBUNd671jWBbi4LG5qvjjO3pDG4fXrEoUUS/F6o+dHsePNi8oNPmPalLWTrm1\n0eoBKBBT1RPuyE1zVMoBpJt+aC27h8sWmIODyqV3ezECgYEA83eMgweLV4hI6kIR\nJLWmEvcPNvtjhXp1t9r4g5FXtK0q/nqDJ479nlJV/dCuckUgGaV4aaZfx3UkwMDd\ni3QMx5k+u1TgFeklFaIVZ40PQEqg74Xd3YC9LDtAvKSeliaTjlS36CYJd1xMJbJk\n8YBu5zg8z1b6ac3o7H27jbig3m0CgYEAwe/k8Ijcb4DUyCSQT5CiCy0PieINg4J4\nMRNI3qfSy5HrK3ECyzAZ6HKPPLVPwI+3Xd416ADXFEzb3WJVWm4c51LqR/4a/SGY\ngRgIsz+flcrP7JMdcKw30kl3TnRV3jlx7ea76KzM+CXJQk7b3U98u/lLP3Q/7AYj\nc7dMp9PytsUCgYEAyOiRQhs6qEvlZ7KHNRTU6/eGTafbM22fsM14oBGTH5x6yy7M\nBhvgPALTxTSsj81tNNywZfaOOSj44DsHVym31gomky3yEQKowJZVNXNY74PmFGIS\neNPgx5xJyqHJ4DwLLbvJWz/wNdgrWjxBQmzql9F3lN3AnQj3Ohhzafq+fW0CgYBZ\nhM1Nhi8SPQp68/207FMQC5WvlKueN5wZMwig1iCEHO/LlpeuiJ584FxjrmGIxg3j\nA04osDKXST73uoshedBXqrs/zfhRPa+ybxCdBNI6B2rgjau6NZRyubybdzGnqSaA\npM+6AAGAzZhPxizQw/8UmWb1fEiBPvggUszMbxYK7QKBgQDZvPTEzxIePYtpT52m\nsGyXCsEEeF5NvZ1CWEDeozv9mSOKOBPZxQTBL1GNDc3vCUrKLK9Xg61cXCPvtBxR\napLFs4LSgPYsGhvMAgawFHjrcoWrNPlFpZvbqZw81qNMbQ/Gd/awcJ/dwnz+pSXn\n54LG00jbcaN0C/F4sITLPGSQXw\u003d\u003d\n-----END PRIVATE KEY-----\n", "client_email": "338104819207-oel57sj9e81qbho5pipfvf32sg5nsu4f@developer.gserviceaccount.com", "client_id": "338104819207-oel57sj9e81qbho5pipfvf32sg5nsu4f.apps.googleusercontent.com", "type": "service_account" }
 - path: /opt/custom/fluentd.conf
   permissions: '0644'
   content: |
