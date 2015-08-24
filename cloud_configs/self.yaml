@@ -32,6 +32,25 @@ coreos:
         ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.244.0.0/16", "Backend": {"Type": "vxlan"}}'
   - name: docker.service
     command: start
+  - name: docker-credentials.service
+    content: |
+      [Unit]
+      Description=Updates .dockercfg file with gcr credentials
+      Requires=docker.service
+      After=docker.service
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/bin/docker run --rm -v app/credentials/auth-file.json:/token/auth-file.json -v $HOME/.dockercfg:/token/.dockercfg --name google_jwt_token gcr.io/tfc-glassic/google-jwt-token
+      ExecStop=/usr/bin/docker stop -t 2 google_jwt_token ; /usr/bin/docker rm -f google_jwt_token
+  - name: docker-credentials.timer
+    command: start
+    content: |
+      [Unit]
+      Description=Run gcr credential updater every 50 minutes
+
+      [Timer]
+      OnCalendar=*:0/50
   - name: generate-serviceaccount-key.service
     command: start
     content: |
