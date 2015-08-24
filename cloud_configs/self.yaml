@@ -41,8 +41,9 @@ coreos:
 
       [Service]
       Type=oneshot
-      ExecStartPre=/bin/touch /root/.dockercfg
-      ExecStart=/usr/bin/docker run --rm -v=/app/credentials/auth-file.json:/token/auth-file.json -v=/root/.dockercfg:/token/.dockercfg --name=google_jwt_token tfcross/google-jwt-gcr-token-docker
+      ExecStartPre=/usr/bin/mkdir -p /var/lib/kubelet
+      ExecStartPre=/bin/touch /var/lib/kubelet/.dockercfg
+      ExecStart=/usr/bin/docker run --rm -v=/app/credentials/auth-file.json:/token/auth-file.json -v=/var/lib/kubelet/.dockercfg:/token/.dockercfg --name=google_jwt_token tfcross/google-jwt-gcr-token-docker
       ExecStop=/bin/bash -c "/usr/bin/docker stop -t 2 google_jwt_token && /usr/bin/docker rm -f google_jwt_token || true"
   - name: docker-credentials.timer
     command: start
@@ -51,7 +52,7 @@ coreos:
       Description=Run gcr credential updater every 50 minutes
 
       [Timer]
-      OnCalendar=*:0/1
+      OnCalendar=*:0/50
   - name: generate-serviceaccount-key.service
     command: start
     content: |
