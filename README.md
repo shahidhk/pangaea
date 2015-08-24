@@ -1,13 +1,12 @@
 # Point and Shoot Kubernetes #
 
-Deploy a Kubernetes application against a cluster.
+These instructions will bring up a Kubernetes application on top of which we can run kubeconfig files.
 
-## Inputs ##
+## Instructions for local: ##
+- install vagrant
+- run 'vagrant up'
+- to ssh into the machine, run 'vagrant ssh'
 
-- Kubernetes object definitions
-- Stuff for client certificate authentication
-
-## Output ##
-
-- Working application on Kubernetes cluster
+## Instructions for gce: ##
+- run 'gce/bootstrap.sh'
 
