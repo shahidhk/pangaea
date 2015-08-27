@@ -51,17 +51,22 @@ future:
 
 /
 /.pangaea # pangaea-folder-contents-but-compiled
-/pangaea +x
-/pangaea/providers
-  /vagrant/Vagrantfile
-  /gce/bootstrap.sh
-/pangaea/coreos
-  /self.yaml
-/pangaea/kubernetes
-  /monitoring
-  /logging
-/pangaea/lib
+/pangaea # python module
+  /pangaea +x
+  /providers
+    /vagrant/Vagrantfile
+    /gce/bootstrap.sh
+  /setup
   /compile
+  /props
+  /examples
+    /app.example
+  /files
+    /coreos
+      /self.yaml
+    /kubernetes
+      /monitoring
+    /logging
 /config
   /vagrant_config.rb # refactor most into Vagrantfile
   /sample.config
