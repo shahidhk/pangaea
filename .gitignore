@@ -1,2 +1,4 @@
 .pangaea
+pangaea/files/vagrant/.vagrant
+
 *.pyc
