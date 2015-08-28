@@ -1,4 +1,6 @@
 .pangaea
 pangaea/files/vagrant/.vagrant
 
+app/secrets
+
 *.pyc

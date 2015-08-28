@@ -1,4 +1,5 @@
 from utils import pangaea_path
+import template_helpers
 import props
 import os
 import shutil
@@ -9,7 +10,8 @@ def compile():
     # all .jinja files are compiled, all other files are copied
     compilation_targets = [
         'pangaea',
-        'app/*/kubefiles'
+        'app/*/kubefiles',
+        'app/secrets'
     ]
     if '.pangaea' in compilation_targets:
         compilation_targets.remove('.pangaea')
@@ -22,7 +24,9 @@ def compile():
     old_root_dir = os.getcwd()
     os.chdir(root_dir)
 
-    j = JinjaCompiler(root_dir, props.get())
+    context = props.get()
+    context['helpers'] = template_helpers.helpers
+    j = JinjaCompiler(root_dir, context)
 
     for f in [
             join(di, fi)
