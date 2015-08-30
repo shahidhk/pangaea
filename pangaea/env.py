@@ -33,6 +33,6 @@ def command_hook(p):
         'env',
          help='print environment variables for tooling',
          description="print environment variables for tooling\n"\
-                     "eval $(pangaea env [-t TOOL]) to set up environment variables"
+                     "\"pangaea env [-t TOOL] | source /dev/stdin\" to set up environment variables"
     )
     argh.set_default_command(p, env)
