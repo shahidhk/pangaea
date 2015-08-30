@@ -19,6 +19,6 @@ def start():
 def stop():
     v.halt()
 
-def env():
+def print_env():
     return "# Vagrant working directory\n"\
-           "export VAGRANT_CWD={}".format(vagrant_path)
+           "export VAGRANT_CWD=\"{}\"".format(vagrant_path)

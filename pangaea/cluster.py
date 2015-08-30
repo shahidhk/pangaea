@@ -1,6 +1,7 @@
 # pangaea tool
-# cluster status | start | stop | reboot
+# cluster {status, start, stop, reboot}
 
+import argh
 import providers.vagrant
 
 def status():
@@ -18,7 +19,7 @@ def restart():
 
 def command_hook(p):
     p = p.add_parser('cluster', help='manage Kubernetes node')
-    s = p.add_subparsers()
+    s = p.add_subparsers(title='Commands')
 
     q = s.add_parser('status')
     q.set_defaults(function=status)
