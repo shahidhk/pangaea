@@ -6,47 +6,6 @@ Local configuration must not be checked in, must not conflict
 Secrets management
 Templated everything, parameters and include other templates
 
-# Tasks #
-
-## kubernetes node, infrastructure, environment ##
-
-parameters:
-config file(s), merged in sequence
-
-hcloud
-  start
-  stop
-  restart = start + stop
-
-impl:
-  compile templates, run the right tool
-
-describe [tool] [-q pipe-able configuration]
-  tool is vagrant, gcloud, ssh, nfs, docker, kubectl
-  set up environment automatically for tool
-
-impl:
-  output configuration file info, or environment variables, and instructions
-
-future:
-  list start and stop nodes
-
-## run kubernetes config files ##
-
-parameters:
-  arbitrary
-helpers:
-  uniform mounted path, to contain all application structure
-
-hctl
-  start stop restart update(rolling) [service name, find corresponding folder in kube_configs]
-
-impl:
-  compile templates and pass to kubectl
-
-future:
-  fswatch
-
 # Folder structure #
 
 /
@@ -85,9 +44,29 @@ future:
 
 # TODO #
 
-- Download archive then extract binaries
+x Download archive then extract binaries
+- helpers for path in templates, such as for mounting
+- dns server would be AWESOME
+- fswatch for compilation
+- secure cluster, everyone talks with a key or token, kube and etcd
 - automatically mount caches for stuff like docker, archive file
 - persistent storage for logging and monitoring
-- dns server would be AWESOME
-- secure cluster, everyone talks with a key or token, kube and etcd
 - Dockerfile builds. understand current workflow
+
+# Pangaea command line tool
+
+$PANGAEA_ENVIRONMENT = 'development:override'
+  # ':' separated list of config files
+
+pangaea
+  cluster
+    status start stop reboot
+    node
+      add remove reboot
+  env
+    # produce eval-able output
+    all
+      # $PAN to pangaea_path so we can do things like create -f $PAN/app/something
+    kubectl docker gcloud vagrant nfs ssh
+  app
+    start stop restart update <name>

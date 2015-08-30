@@ -9,7 +9,7 @@ __PROPS.path = None
 
 def get(path='config/sample.json'):
     global __PROPS
-    if __PROPS.props is None:
+    if __PROPS.props is None or __PROPS.path != path:
         fp = pangaea_path(path)
         _, ext = os.path.splitext(fp)
         with open(fp) as f:
