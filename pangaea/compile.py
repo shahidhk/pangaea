@@ -1,10 +1,10 @@
-from utils import pangaea_path
-import template_helpers
-import props
 import os
 import shutil
 import glob
-import pdb
+
+from pangaea.utils import pangaea_path
+from pangaea import template_helpers
+from pangaea import props
 
 def compile():
     # all .jinja files are compiled, all other files are copied

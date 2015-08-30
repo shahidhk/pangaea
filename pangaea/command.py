@@ -2,8 +2,8 @@
 
 import argh
 
-import cluster
-import env
+from pangaea import cluster
+from pangaea import env
 
 def command():
     p = argh.ArghParser(description='Pangaea command centre', epilog='TODO:documentation')

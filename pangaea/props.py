@@ -1,6 +1,7 @@
 import os
 import yaml, json
-from utils import pangaea_path
+
+from pangaea.utils import pangaea_path
 
 class D: pass
 __PROPS = D()

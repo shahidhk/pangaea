@@ -1,7 +1,7 @@
 import vagrant
 import os
 
-from utils import pangaea_path
+from pangaea.utils import pangaea_path
 
 vagrant_path = pangaea_path('pangaea/files/vagrant')
 

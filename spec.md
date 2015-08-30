@@ -9,13 +9,12 @@ Templated everything, parameters and include other templates
 # Folder structure #
 
 /
+/pan +x
 /.pangaea # pangaea-folder-contents-but-compiled
 /pangaea # python module
-  /pangaea +x
   /providers
     /vagrant/Vagrantfile
     /gce/bootstrap.sh
-  /setup
   /compile
   /props
   /examples

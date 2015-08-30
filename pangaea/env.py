@@ -4,13 +4,13 @@
 import argh
 import importlib
 
-from utils import pangaea_path
-import tooling
+from pangaea.utils import pangaea_path
+from pangaea import tooling
 
 supported_tools = ['vagrant']
 
 for t in supported_tools:
-    importlib.import_module('tooling.{}'.format(t))
+    importlib.import_module('pangaea.tooling.{}'.format(t))
 
 def env(
         tool : 'tool to print environment for' = 'ALL'

@@ -2,20 +2,20 @@
 # cluster {status, start, stop, reboot}
 
 import argh
-import providers.vagrant
+from pangaea.providers import vagrant
 
 def status():
-    providers.vagrant.status()
+    vagrant.status()
 
 def start():
-    providers.vagrant.start()
+    vagrant.start()
 
 def stop():
-    providers.vagrant.stop()
+    vagrant.stop()
 
 def restart():
-    providers.vagrant.stop()
-    providers.vagrant.start()
+    vagrant.stop()
+    vagrant.start()
 
 def command_hook(p):
     p = p.add_parser('cluster', help='manage Kubernetes node')

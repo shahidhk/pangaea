@@ -3,7 +3,7 @@
 import yaml
 from base64 import b64encode
 
-from utils import pangaea_path
+from pangaea.utils import pangaea_path
 
 def kube_secret(name, secrets):
     ob = \
