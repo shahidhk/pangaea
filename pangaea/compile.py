@@ -54,6 +54,7 @@ class JinjaCompiler:
         from jinja2 import Environment, FileSystemLoader
         self.env = Environment(loader=FileSystemLoader('.'))
         self.env.globals['config'] = config
+
     def compile(self, in_file, out_file, config={}):
         with open(out_file, 'w') as f:
             f.write(self.env.get_template(in_file).render(config))

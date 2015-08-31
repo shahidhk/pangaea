@@ -44,6 +44,7 @@ Templated everything, parameters and include other templates
 # TODO #
 
 x Download archive then extract binaries
+- template coreos cloud config
 - helpers for path in templates, such as for mounting
 - dns server would be AWESOME
 - fswatch for compilation
@@ -66,6 +67,6 @@ pangaea
     # produce eval-able output
     all
       # $PAN to pangaea_path so we can do things like create -f $PAN/app/something
-    kubectl docker gcloud vagrant nfs ssh
+    kubectl docker gcloud vagrant nfs ssh fleetctl
   app
     start stop restart update <name>

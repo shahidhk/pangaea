@@ -15,7 +15,6 @@ for t in supported_tools:
 def env(
         tool : 'tool to print environment for' = 'ALL'
     ):
-    out = ""
     if tool == 'ALL':
         print(
             "# Location of compiled files\n"\
