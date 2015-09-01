@@ -44,13 +44,13 @@ Templated everything, parameters and include other templates
 # TODO #
 
 x Download archive then extract binaries
+x dns server
 - template coreos cloud config: ip addr, dns for kubelet
+- persistent storage for logging and monitoring
 - helpers for path in templates, such as for mounting
-- dns server would be AWESOME
 - fswatch for compilation
 - secure cluster, everyone talks with a key or token, kube and etcd
 - automatically mount caches for stuff like docker, archive file
-- persistent storage for logging and monitoring
 - Dockerfile builds. understand current workflow
 
 # Pangaea command line tool
