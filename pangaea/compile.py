@@ -1,6 +1,7 @@
 import os
 import shutil
 import glob
+import argh
 
 from pangaea.utils import pangaea_path
 from pangaea import template_helpers
@@ -59,5 +60,6 @@ class JinjaCompiler:
         with open(out_file, 'w') as f:
             f.write(self.env.get_template(in_file).render(config))
 
-if __name__ == '__main__':
-    compile()
+def command_hook(p):
+    p = p.add_parser('compile', help='compile all templates')
+    argh.set_default_command(p, compile)

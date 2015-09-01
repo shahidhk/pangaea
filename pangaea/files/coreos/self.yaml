@@ -63,7 +63,7 @@ coreos:
       ExecStartPre=/usr/bin/chmod +x /opt/credentials/make-ca-cert.sh
       ExecStart=/bin/bash -c '/opt/credentials/make-ca-cert.sh \
         $(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip || echo $DEFAULT_IPV4) \
-        IP:10.100.0.1,IP:$(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip || echo $ETH1_IPV4)'
+        IP:10.0.0.1,IP:$(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip || echo $ETH1_IPV4)'
       RemainAfterExit=yes
       Type=oneshot
   - name: kube-binaries.service
@@ -116,7 +116,7 @@ coreos:
       --insecure_port=8080 \
       --kubelet_https=true \
       --secure_port=6443 \
-      --service-cluster-ip-range=10.100.0.0/16 \
+      --service-cluster-ip-range=10.0.0.0/16 \
       --etcd_servers=http://127.0.0.1:2379 \
       --bind-address=${DEFAULT_IPV4} \
       --logtostderr=true \
@@ -193,6 +193,8 @@ coreos:
       --api_servers=$private_ipv4:8080 \
       --allow_privileged=true \
       --logtostderr=true \
+      --cluster-dns=10.0.0.10 \
+      --cluster-domain=kubeapp \
       --healthz_bind_address=0.0.0.0 \
       --healthz_port=10248
       Restart=always

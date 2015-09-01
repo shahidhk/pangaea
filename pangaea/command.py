@@ -2,8 +2,7 @@
 
 import argh
 
-from pangaea import cluster
-from pangaea import env
+from pangaea import cluster, env, compile
 
 def command():
     p = argh.ArghParser(description='Pangaea command centre', epilog='TODO:documentation')
@@ -12,6 +11,7 @@ def command():
     # add subparsers
     cluster.command_hook(s)
     env.command_hook(s)
+    compile.command_hook(s)
 
     p.dispatch()
 
