@@ -48,6 +48,7 @@ x dns server
 - gce support -test
 - compilation target parameter
 - complete env tooling
+- replace env with template + env var strings
 - template coreos cloud config: ip addr, dns for kubelet
 - persistent storage for logging and monitoring
 - helpers for path in templates, such as for mounting
@@ -55,6 +56,45 @@ x dns server
 - secure cluster, everyone talks with a key or token, kube and etcd
 - automatically mount caches for stuff like docker, archive file
 - Dockerfile builds. understand current workflow
+
+redefine.
+
+template compiler
+  parameter based config
+  template helpers
+scripts
+  print env variables
+    templated
+      info: current config files, status
+      all
+        if env is dev then vagrant else gce
+      vagrant
+    wrapper script calls template() then calls rendered script
+components
+  setup
+    coreos
+      self.yaml
+    kubernetes
+      monitoring
+      logging
+      dns
+      template and call kubectl
+    vagrant
+      vagrantfile
+      vagrant.rb
+    gce
+      up
+      down
+  env
+    vagrant
+    fleetctl
+    kubectl
+    gcloud
+    nfs
+    docker
+    ssh
+  #
+
 
 # Pangaea command line tool
 
