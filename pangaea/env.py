@@ -2,36 +2,34 @@
 # env [-t TOOL]
 
 import argh
-import importlib
+import glob
+import os
 
 from pangaea.utils import pangaea_path
 from pangaea import tooling
-
-supported_tools = ['vagrant']
-
-for t in supported_tools:
-    importlib.import_module('pangaea.tooling.{}'.format(t))
+from pangaea import compile
 
 def env(
         tool : 'tool to print environment for' = 'ALL'
     ):
+
+    gpath = None
+
     if tool == 'ALL':
-        print(
-            "# Location of compiled files\n"\
-            "export PAN=\"{}\"\n".format(pangaea_path('.pangaea'))
-        )
-        for t in supported_tools:
-            print(getattr(getattr(tooling, t), 'print_env')())
-    elif tool in supported_tools:
-        print(getattr(getattr(tooling, tool), 'print_env')())
+        gpath = '*'
     else:
-        print("Supported tools are: " + ' '.join(supported_tools))
+        gpath = "({}|{}.*)".format(tool)
+
+    for f in glob.glob(os.path.join(compile.compile('pangaea/files/env'), gpath)):
+        with open(f) as fd:
+            print(fd.read())
 
 def command_hook(p):
     p = p.add_parser(
         'env',
          help='print environment variables for tooling',
          description="print environment variables for tooling\n"\
+                     "supported tools: vagrant\n"\
                      "\"pangaea env [-t TOOL] | source /dev/stdin\" to set up environment variables"
     )
     argh.set_default_command(p, env)

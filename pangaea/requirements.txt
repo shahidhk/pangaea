@@ -1,4 +1,3 @@
 argh
 jinja2
 pyyaml
-python-vagrant

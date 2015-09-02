@@ -3,52 +3,61 @@ import shutil
 import glob
 import argh
 
-from pangaea.utils import pangaea_path
+from pangaea import utils
 from pangaea import template_helpers
 from pangaea import props
 
-def compile():
-    # all .jinja files are compiled, all other files are copied
-    compilation_targets = [
-        'pangaea',
-        'app/*/kubefiles',
-        'app/secrets'
-    ]
+def compile(target=None):
+
+    context = props.get()
+
+    context['helpers'] = template_helpers.helpers
+    context['helpers']['compile'] = compile
+
+    compilation_targets = target and [target] or context['pangaea']['compiler']['targets']
     if '.pangaea' in compilation_targets:
         compilation_targets.remove('.pangaea')
 
-    join = os.path.join
-
-    root_dir = pangaea_path('.')
-    os.makedirs(join(root_dir, '.pangaea'), exist_ok=True)
+    root_dir = utils.pangaea_path('.')
+    os.makedirs(os.path.join(root_dir, '.pangaea'), exist_ok=True)
 
     old_root_dir = os.getcwd()
     os.chdir(root_dir)
 
-    context = props.get()
-    context['helpers'] = template_helpers.helpers
-    j = JinjaCompiler(root_dir, context)
-
-    for f in [
-            join(di, fi)
+    for tar in [
+            g
             for t in compilation_targets
-            for d in glob.glob(t)
-            for (di, _, fis) in os.walk(d)
-            for fi in fis
+            for g in glob.glob(t)
         ]:
-        
-        path, fil = os.path.split(f)
-        fname, ext = os.path.splitext(fil)
 
-        out_file = join('.pangaea', path, fname)
-        os.makedirs(join('.pangaea', path), exist_ok=True)
-
-        if ext == '.jinja':
-            j.compile(f, out_file)
+        if os.path.isdir(tar):
+            for f in [
+                os.path.join(di, fi)
+                for (di, _, fis) in os.walk(tar)
+                for fi in fis
+                ]:
+                compile_file(root_dir, f, context)
         else:
-            shutil.copyfile(f, join('.pangaea', f))
+            compile_file(root_dir, f, context)
 
     os.chdir(old_root_dir)
+
+    if target:
+        return os.path.join(root_dir, '.pangaea', target)
+
+def compile_file(root_dir, f, context):
+    j = JinjaCompiler(root_dir, context)
+
+    path, fil = os.path.split(f)
+    fname, ext = os.path.splitext(fil)
+
+    out_file = os.path.join('.pangaea', path, fname)
+    os.makedirs(os.path.join('.pangaea', path), exist_ok=True)
+
+    if ext == '.jinja':
+        j.compile(f, out_file)
+    elif context['pangaea']['compiler']['default_copy']:
+        shutil.copyfile(f, os.path.join('.pangaea', f))
 
 class JinjaCompiler:
     def __init__(self, root_dir, config={}):

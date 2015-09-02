@@ -1,6 +1,0 @@
-{
-  "kubernetes": {
-    "dns_domain": "kubeapp",
-    "dns_server_ip": "10.0.0.10"
-  }
-}

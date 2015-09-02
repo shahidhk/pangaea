@@ -8,7 +8,7 @@ __PROPS = D()
 __PROPS.props = None
 __PROPS.path = None
 
-def get(path='config/sample.json'):
+def get(path='config/config.sample.yaml'):
     global __PROPS
     if __PROPS.props is None or __PROPS.path != path:
         fp = pangaea_path(path)
