@@ -45,6 +45,9 @@ Templated everything, parameters and include other templates
 
 x Download archive then extract binaries
 x dns server
+- gce support -test
+- compilation target parameter
+- complete env tooling
 - template coreos cloud config: ip addr, dns for kubelet
 - persistent storage for logging and monitoring
 - helpers for path in templates, such as for mounting
@@ -68,5 +71,3 @@ pangaea
     all
       # $PAN to pangaea_path so we can do things like create -f $PAN/app/something
     kubectl docker gcloud vagrant nfs ssh fleetctl
-  app
-    start stop restart update <name>
