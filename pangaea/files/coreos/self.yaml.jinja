@@ -61,11 +61,40 @@ coreos:
       ExecStartPre=-/usr/bin/mkdir -p /opt/credentials
       ExecStartPre=/usr/bin/curl -L -o /opt/credentials/make-ca-cert.sh https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/saltbase/salt/generate-cert/make-ca-cert.sh
       ExecStartPre=/usr/bin/chmod +x /opt/credentials/make-ca-cert.sh
+      {% if config['provider'] == 'vagrant' %}
+      ExecStart=/bin/bash -c '/opt/credentials/make-ca-cert.sh $DEFAULT_IPV4 IP:10.0.0.1,IP:$ETH1_IPV4'
+      {% elif config['provider'] == 'gce' %}
       ExecStart=/bin/bash -c '/opt/credentials/make-ca-cert.sh \
-        $(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip || echo $DEFAULT_IPV4) \
-        IP:10.0.0.1,IP:$(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip || echo $ETH1_IPV4)'
+        $(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip) \
+        IP:10.0.0.1,IP:$(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)'
+      {% endif %}
       RemainAfterExit=yes
       Type=oneshot
+  {% if config['coreos']['docker_gcr_credentials'] %}
+  - name: docker.service
+    command: start
+  - name: docker-credentials.service
+    content: |
+      [Unit]
+      Description=Update .dockercfg file with GCR credentials
+      Requires=docker.service
+      After=docker.service
+
+      [Service]
+      Type=oneshot
+      ExecStartPre=/usr/bin/mkdir -p /var/lib/kubelet
+      ExecStartPre=/bin/touch /var/lib/kubelet/.dockercfg
+      ExecStart=/usr/bin/docker run --rm -v=/location/to/auth-file.json:/token/auth-file.json -v=/var/lib/kubelet/.dockercfg:/token/.dockercfg --name=google_jwt_token hasura/google-jwt-gcr-token
+      ExecStop=/bin/bash -c "/usr/bin/docker stop -t 2 google_jwt_token && /usr/bin/docker rm -f google_jwt_token || true"
+  - name: docker-credentials.timer
+    command: start
+    content: |
+      [Unit]
+      Description=Refresh docker GCR credentials every 50 minutes
+
+      [Timer]
+      OnCalendar=*:0/50
+  {% endif %}
   - name: kube-binaries.service
     command: start
     content: |

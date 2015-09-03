@@ -1,10 +1,17 @@
-pangaea:
-  compiler:
-    default_copy: true
-    targets:
-      - pangaea
-      - app/*/kubefiles
-      - app/secrets
+environment: development
+# provider: {vagrant, gce}
+provider: vagrant
+compiler:
+  default_copy: true
+  targets:
+    - pangaea
+    - config
+    - app/*/kubefiles
+    - app/secrets
 kubernetes:
   dns_domain: kubeapp
   dns_server_ip: 10.0.0.10
+coreos:
+  docker_gcr_credentials: true
+gce:
+  instance_name: testinstance

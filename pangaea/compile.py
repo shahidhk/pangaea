@@ -7,6 +7,18 @@ from pangaea import utils
 from pangaea import template_helpers
 from pangaea import props
 
+__j = None # Jinja compiler environment
+
+# compile target relative to cwd
+def compile_rel(target=None):
+    root_dir = utils.pangaea_path('.')
+    if target:
+        if not os.path.isabs(target):
+            target = os.path.abspath(target)
+        target = os.path.relpath(target, root_dir)
+    return compile(target)
+
+# target relative to pangaea path
 def compile(target=None):
 
     context = props.get()
@@ -14,13 +26,17 @@ def compile(target=None):
     context['helpers'] = template_helpers.helpers
     context['helpers']['compile'] = compile
 
-    compilation_targets = target and [target] or context['pangaea']['compiler']['targets']
-    if '.pangaea' in compilation_targets:
-        compilation_targets.remove('.pangaea')
-
     root_dir = utils.pangaea_path('.')
     os.makedirs(os.path.join(root_dir, '.pangaea'), exist_ok=True)
 
+    if target:
+        compilation_targets = [target]
+    else:
+        compilation_targets = context['compiler']['targets']
+    if '.pangaea' in compilation_targets:
+        compilation_targets.remove('.pangaea')
+
+    # change directory to pangaea_path
     old_root_dir = os.getcwd()
     os.chdir(root_dir)
 
@@ -32,21 +48,24 @@ def compile(target=None):
 
         if os.path.isdir(tar):
             for f in [
-                os.path.join(di, fi)
-                for (di, _, fis) in os.walk(tar)
-                for fi in fis
+                    os.path.join(di, fi)
+                    for (di, _, fis) in os.walk(tar)
+                    for fi in fis
                 ]:
                 compile_file(root_dir, f, context)
         else:
-            compile_file(root_dir, f, context)
+            compile_file(root_dir, tar, context)
 
+        if target:
+            return os.path.join(root_dir, '.pangaea', target)
+
+    # change directory to previous
     os.chdir(old_root_dir)
 
-    if target:
-        return os.path.join(root_dir, '.pangaea', target)
-
 def compile_file(root_dir, f, context):
-    j = JinjaCompiler(root_dir, context)
+    global __j
+    __j = __j or JinjaCompiler(root_dir, context)
+    j = __j
 
     path, fil = os.path.split(f)
     fname, ext = os.path.splitext(fil)
@@ -56,7 +75,7 @@ def compile_file(root_dir, f, context):
 
     if ext == '.jinja':
         j.compile(f, out_file)
-    elif context['pangaea']['compiler']['default_copy']:
+    elif context['compiler']['default_copy']:
         shutil.copyfile(f, os.path.join('.pangaea', f))
 
 class JinjaCompiler:
@@ -71,4 +90,4 @@ class JinjaCompiler:
 
 def command_hook(p):
     p = p.add_parser('compile', help='compile all templates')
-    argh.set_default_command(p, compile)
+    argh.set_default_command(p, compile_rel)

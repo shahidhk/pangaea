@@ -45,13 +45,18 @@ Templated everything, parameters and include other templates
 
 x Download archive then extract binaries
 x dns server
-- gce support -test
-- compilation target parameter
+x compilation target parameter
+x replace env with template + env var strings
+x gce support -test
+- gce mount disk
 - complete env tooling
-- replace env with template + env var strings
 - template coreos cloud config: ip addr, dns for kubelet
+- add docker gcr creds
+- vagrant mount permissions
 - persistent storage for logging and monitoring
 - helpers for path in templates, such as for mounting
+- refactor compile
+- fix the utter mess with paths
 - fswatch for compilation
 - secure cluster, everyone talks with a key or token, kube and etcd
 - automatically mount caches for stuff like docker, archive file

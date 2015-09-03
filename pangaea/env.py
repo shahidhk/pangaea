@@ -18,9 +18,9 @@ def env(
     if tool == 'ALL':
         gpath = '*'
     else:
-        gpath = "({}|{}.*)".format(tool)
+        gpath = tool+'*'
 
-    for f in glob.glob(os.path.join(compile.compile('pangaea/files/env'), gpath)):
+    for f in glob.glob(compile.compile(os.path.join('pangaea/files/env', gpath))):
         with open(f) as fd:
             print(fd.read())
 
