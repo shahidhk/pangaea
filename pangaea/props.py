@@ -8,12 +8,13 @@ __PROPS = D()
 __PROPS.props = None
 __PROPS.path = None
 
-def get(path='config/config.sample.yaml'):
+def get(path=None):
+    path = pangaea_path(path or os.path.join('config', os.getenv('PANGAEA_CONFIG', 'development.yaml')))
+
     global __PROPS
     if __PROPS.props is None or __PROPS.path != path:
-        fp = pangaea_path(path)
-        _, ext = os.path.splitext(fp)
-        with open(fp) as f:
+        _, ext = os.path.splitext(path)
+        with open(path) as f:
             if ext == '.json':
                 __PROPS.props = json.load(f)
             elif ext == '.yaml' or ext == '.yml':

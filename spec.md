@@ -103,8 +103,7 @@ components
 
 # Pangaea command line tool
 
-$PANGAEA_ENVIRONMENT = 'development:override'
-  # ':' separated list of config files
+$PANGAEA_ENVIRONMENT = 'development.yaml'
 
 pangaea
   cluster
