@@ -48,9 +48,9 @@ x dns server
 x compilation target parameter
 x replace env with template + env var strings
 x gce support -test
-x add docker gcr creds
 x template coreos cloud config: ip addr, dns for kubelet
 x refactor compile
+- add docker gcr creds
 - gce mount disk
 - complete env tooling
 - vagrant mount permissions

@@ -70,31 +70,6 @@ coreos:
       {% endif %}
       RemainAfterExit=yes
       Type=oneshot
-  {% if config['coreos']['docker_gcr_credentials'] %}
-  - name: docker.service
-    command: start
-  - name: docker-credentials.service
-    content: |
-      [Unit]
-      Description=Update .dockercfg file with GCR credentials
-      Requires=docker.service
-      After=docker.service
-
-      [Service]
-      Type=oneshot
-      ExecStartPre=/usr/bin/mkdir -p /var/lib/kubelet
-      ExecStartPre=/bin/touch /var/lib/kubelet/.dockercfg
-      ExecStart=/usr/bin/docker run --rm -v=/location/to/auth-file.json:/token/auth-file.json -v=/var/lib/kubelet/.dockercfg:/token/.dockercfg --name=google_jwt_token hasura/google-jwt-gcr-token
-      ExecStop=/bin/bash -c "/usr/bin/docker stop -t 2 google_jwt_token && /usr/bin/docker rm -f google_jwt_token || true"
-  - name: docker-credentials.timer
-    command: start
-    content: |
-      [Unit]
-      Description=Refresh docker GCR credentials every 50 minutes
-
-      [Timer]
-      OnCalendar=*:0/50
-  {% endif %}
   - name: kube-binaries.service
     command: start
     content: |

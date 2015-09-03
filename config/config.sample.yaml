@@ -1,6 +1,6 @@
-environment: development
+environment: production
 # provider: {vagrant, gce}
-provider: vagrant
+provider: gce
 compiler:
   default_copy: true
   targets:
