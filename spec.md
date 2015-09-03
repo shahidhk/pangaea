@@ -48,14 +48,16 @@ x dns server
 x compilation target parameter
 x replace env with template + env var strings
 x gce support -test
+x add docker gcr creds
+x template coreos cloud config: ip addr, dns for kubelet
+x refactor compile
 - gce mount disk
 - complete env tooling
-- template coreos cloud config: ip addr, dns for kubelet
-- add docker gcr creds
 - vagrant mount permissions
 - persistent storage for logging and monitoring
 - helpers for path in templates, such as for mounting
-- refactor compile
+
+later
 - fix the utter mess with paths
 - fswatch for compilation
 - secure cluster, everyone talks with a key or token, kube and etcd

@@ -222,7 +222,7 @@ coreos:
       --api_servers=$private_ipv4:8080 \
       --allow_privileged=true \
       --logtostderr=true \
-      --cluster-dns=10.0.0.10 \
+      --cluster-dns={{ config['kubernetes']['dns_server_ip'] }} \
       --cluster-domain=kubeapp \
       --healthz_bind_address=0.0.0.0 \
       --healthz_port=10248
