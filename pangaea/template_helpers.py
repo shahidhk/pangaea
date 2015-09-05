@@ -3,7 +3,7 @@
 import yaml
 from base64 import b64encode
 
-from pangaea.utils import pangaea_path
+from pangaea import utils, props
 
 def kube_secret(name, secrets):
     ob = \
@@ -18,9 +18,15 @@ def kube_secret(name, secrets):
     return yaml.dump(ob)
 
 def read_file(f):
-    with open(pangaea_path(f)) as f:
+    with open(utils.pangaea_path(f)) as f:
         return f.read()
 
+def kube_apiserver_ip():
+    if props.get()['provider'] == 'gce' and props.get()['environment'] == 'development':
+        # TODO: system exec gcloud # get ip address
+        pass
+
 helpers = {}
-for f in [pangaea_path, kube_secret, read_file]:
+for f in [utils.pangaea_path, kube_secret, read_file]:
     helpers[f.__name__] = f
+    helpers['gce_apiserver_ip'] = kube_apiserver_ip()

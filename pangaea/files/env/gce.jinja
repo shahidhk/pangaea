@@ -1,0 +1,3 @@
+{% if config['environment'] == 'development' and config['provider'] == 'gce' %}
+alias kubectl='kubectl -s {{ config['helpers']['gce_apiserver_ip'] }}'
+{% endif %}

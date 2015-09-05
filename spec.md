@@ -50,8 +50,15 @@ x replace env with template + env var strings
 x gce support -test
 x template coreos cloud config: ip addr, dns for kubelet
 x refactor compile
-- add docker gcr creds
+- change compile to be separate unit that compiles to any path
+    including relative and absolute paths
+    compile output filename is templatable
+- add docker gcr creds as kube pod with secrets
+    do:
+      run fleet docker, that talks to apiserver through its secure port, library
+- expose specific port on service
 - gce mount disk
+- secure access to apiserver
 - complete env tooling
 - vagrant mount permissions
 - persistent storage for logging and monitoring
@@ -101,6 +108,14 @@ components
     docker
     ssh
   #
+
+# Templaing
+
+output to the same directory
+  always run pan compile
+    idempotent
+  option: prefix ".pan"
+  so include ".pan" paths insteadj
 
 
 # Pangaea command line tool

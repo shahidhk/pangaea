@@ -54,10 +54,7 @@ def compile(target=None):
                 ]:
                 compile_file(root_dir, f, context)
         else:
-            compile_file(root_dir, tar, context)
-
-        if target:
-            return os.path.join(root_dir, '.pangaea', target)
+            return compile_file(root_dir, tar, context)
 
     # change directory to previous
     os.chdir(old_root_dir)
@@ -77,6 +74,8 @@ def compile_file(root_dir, f, context):
         j.compile(f, out_file)
     elif context['compiler']['default_copy']:
         shutil.copyfile(f, os.path.join('.pangaea', f))
+
+    return out_file
 
 class JinjaCompiler:
     def __init__(self, root_dir, config={}):
