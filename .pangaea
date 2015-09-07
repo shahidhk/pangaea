@@ -8,6 +8,11 @@ compiler:
     - config
     - app/*/kubefiles
     - app/secrets
+compiler:
+  targets:
+    - path: pangaea
+      to: pangaea
+      filename_template: "pan.%f.%g"
 kubernetes:
   dns_domain: kubeapp
   dns_server_ip: 10.0.0.10
