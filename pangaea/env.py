@@ -6,7 +6,6 @@ import glob
 import os
 
 from pangaea.utils import pangaea_path
-from pangaea import tooling
 from pangaea import compile
 
 def env(
