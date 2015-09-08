@@ -6,7 +6,7 @@ require 'fileutils'
 Vagrant.require_version ">= 1.6.0"
 
 CLOUD_CONFIG_PATH = File.join(File.dirname(__FILE__), "../coreos/self.yaml")
-CONFIG = File.join(File.dirname(__FILE__), "../../../config/config.rb")
+CONFIG = File.join(File.dirname(__FILE__), "../../../config/vagrant.rb")
 
 # Defaults for config options defined in CONFIG
 $num_instances = 1
