@@ -16,11 +16,11 @@ def env(
     gpath = None
 
     if tool == 'ALL':
-        gpath = '*'
+        gpath = 'pan.*'
     else:
-        gpath = tool+'*'
+        gpath = 'pan.'+tool+'*'
 
-    for f in glob.glob(os.path.join('pangaea.compiled/files/env/', gpath)):
+    for f in glob.glob(os.path.join('pangaea/files/env/', gpath)):
         with open(f) as fd:
             print(fd.read())
 
