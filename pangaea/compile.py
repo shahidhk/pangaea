@@ -7,80 +7,76 @@ from pangaea import utils
 from pangaea import template_helpers
 from pangaea import props
 
-__j = None # Jinja compiler environment
+__j = None # Jinja compiler
 
-# compile target relative to cwd
-def compile_rel(target=None):
-    root_dir = utils.pangaea_path('.')
-    if target:
-        if not os.path.isabs(target):
-            target = os.path.abspath(target)
-        target = os.path.relpath(target, root_dir)
-    return compile(target)
+''' command line compile wrapper. parses command line arguments and config files. '''
+def compile_c(input_t=None, output_t=None):
+    if input_t is not None:
+        return compile(input_t, output_t)
+    else: # default to config file
+        for t in props.get()['compiler']['targets']:
+            to = t.get('to')
+            to = to and utils.pangaea_path(to)
+            compile(t['path'], to)
 
-# target relative to pangaea path
-def compile(target=None):
+'''
+    compile a glob-able path input_t
+    output directory ouput_t when input_t is a file or directory, undefined behaviour for glob-able input_t
+'''
+def compile(
+        input_t : 'input target path',
+        output_t : 'output target path, defaults to same path' = None,
+        ):
 
-    context = props.get()
+    input_t = os.path.abspath(input_t)
+    output_t = output_t and os.path.abspath(output_t)
 
-    context['helpers'] = template_helpers.helpers
-    context['helpers']['compile'] = compile
-
-    root_dir = utils.pangaea_path('.')
-    os.makedirs(os.path.join(root_dir, '.pangaea'), exist_ok=True)
-
-    if target:
-        compilation_targets = [target]
-    else:
-        compilation_targets = context['compiler']['targets']
-    if '.pangaea' in compilation_targets:
-        compilation_targets.remove('.pangaea')
-
-    # change directory to pangaea_path
-    old_root_dir = os.getcwd()
-    os.chdir(root_dir)
-
-    for tar in [
-            g
-            for t in compilation_targets
-            for g in glob.glob(t)
-        ]:
-
-        if os.path.isdir(tar):
+    for g in glob.glob(input_t):
+        if os.path.isdir(g):
             for f in [
                     os.path.join(di, fi)
-                    for (di, _, fis) in os.walk(tar)
+                    for (di, _, fis) in os.walk(g)
                     for fi in fis
                 ]:
-                compile_file(root_dir, f, context)
+                outd = output_t \
+                    and os.path.join(
+                        output_t,
+                        os.path.relpath(f, g)
+                    ) \
+                    or f
+                outd = os.path.split(outd)[0]
+                compile_file(f, outd)
         else:
-            return compile_file(root_dir, tar, context)
+            outd = output_t or os.path.split(input_t)[0]
+            return compile_file(g, outd)
 
-    # change directory to previous
-    os.chdir(old_root_dir)
+''' compiles a single file '''
+def compile_file(input_f, output_d):
 
-def compile_file(root_dir, f, context):
     global __j
-    __j = __j or JinjaCompiler(root_dir, context)
-    j = __j
+    if __j is None:
+        context = props.get()
 
-    path, fil = os.path.split(f)
-    fname, ext = os.path.splitext(fil)
+        context['helpers'] = template_helpers.helpers
+        context['helpers']['compile'] = compile
 
-    out_file = os.path.join('.pangaea', path, fname)
-    os.makedirs(os.path.join('.pangaea', path), exist_ok=True)
+        __j = JinjaCompiler('/', context)
+
+    path, file_name = os.path.split(input_f)
+    fname, ext = os.path.splitext(file_name)
 
     if ext == '.jinja':
-        j.compile(f, out_file)
-    elif context['compiler']['default_copy']:
-        shutil.copyfile(f, os.path.join('.pangaea', f))
+        os.makedirs(output_d, exist_ok=True)
+        output_f = os.path.join(output_d, fname)
 
-    return out_file
+        __j.compile(input_f, output_f)
+
+        return output_f
 
 class JinjaCompiler:
-    def __init__(self, root_dir, config={}):
+    def __init__(self, root_dir='/', config={}):
         from jinja2 import Environment, FileSystemLoader
-        self.env = Environment(loader=FileSystemLoader('.'))
+        self.env = Environment(loader=FileSystemLoader(root_dir))
         self.env.globals['config'] = config
 
     def compile(self, in_file, out_file, config={}):
@@ -89,4 +85,4 @@ class JinjaCompiler:
 
 def command_hook(p):
     p = p.add_parser('compile', help='compile all templates')
-    argh.set_default_command(p, compile_rel)
+    argh.set_default_command(p, compile_c)

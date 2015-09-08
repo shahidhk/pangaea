@@ -9,7 +9,7 @@ __PROPS.props = None
 __PROPS.path = None
 
 def get(path=None):
-    path = pangaea_path(path or os.path.join('config', os.getenv('PANGAEA_CONFIG', 'config.sample.yaml')))
+    path = pangaea_path(path or os.getenv('PANGAEA_CONFIG', '.pangaea'))
 
     global __PROPS
     if __PROPS.props is None or __PROPS.path != path:
@@ -17,7 +17,7 @@ def get(path=None):
         with open(path) as f:
             if ext == '.json':
                 __PROPS.props = json.load(f)
-            elif ext == '.yaml' or ext == '.yml':
+            else: # default to yaml
                 __PROPS.props = yaml.load(f)
         __PROPS.path = path
     return __PROPS.props

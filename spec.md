@@ -109,7 +109,7 @@ components
     ssh
   #
 
-# Templaing
+# Templating
 
 output to the same directory
   always run pan compile

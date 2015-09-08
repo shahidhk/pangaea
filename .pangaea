@@ -2,17 +2,15 @@ environment: development
 # provider: {vagrant, gce}
 provider: vagrant
 compiler:
-  default_copy: true
-  targets:
-    - pangaea
-    - config
-    - app/*/kubefiles
-    - app/secrets
-compiler:
   targets:
     - path: pangaea
-      to: pangaea
-      filename_template: "pan.%f.%g"
+      to: pangaeac
+    - path: config
+    - path: app/*/kubefiles
+      to: pangaeac
+    - path: app/sec*
+      to: pangaeac
+
 kubernetes:
   dns_domain: kubeapp
   dns_server_ip: 10.0.0.10
