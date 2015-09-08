@@ -5,3 +5,6 @@ app/secrets
 app/test
 
 *.pyc
+
+# compiled files filename_mask
+pan.*

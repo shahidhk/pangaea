@@ -53,6 +53,7 @@ x refactor compile
 x change compile to be separate unit that compiles to any path
     including relative and absolute paths
     compile output filename is templatable
+    filename mask
 - add docker gcr creds as kube pod with secrets
     do:
       run fleet docker, that talks to apiserver through its secure port, library
