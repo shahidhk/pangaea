@@ -50,7 +50,7 @@ x replace env with template + env var strings
 x gce support -test
 x template coreos cloud config: ip addr, dns for kubelet
 x refactor compile
-- change compile to be separate unit that compiles to any path
+x change compile to be separate unit that compiles to any path
     including relative and absolute paths
     compile output filename is templatable
 - add docker gcr creds as kube pod with secrets

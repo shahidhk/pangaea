@@ -4,7 +4,7 @@ provider: vagrant
 compiler:
   targets:
     - path: pangaea
-      to: pangaeac
+      to: pangaea.compiled
     - path: config
     - path: app/*/kubefiles
       to: pangaeac

@@ -48,7 +48,7 @@ def compile(
                 compile_file(f, outd)
         else:
             outd = output_t or os.path.split(input_t)[0]
-            return compile_file(g, outd)
+            compile_file(g, outd)
 
 ''' compiles a single file '''
 def compile_file(input_f, output_d):

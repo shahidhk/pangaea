@@ -20,7 +20,7 @@ def env(
     else:
         gpath = tool+'*'
 
-    for f in glob.glob(compile.compile(os.path.join('pangaea/files/env', gpath))):
+    for f in glob.glob(os.path.join('pangaea.compiled/files/env/', gpath)):
         with open(f) as fd:
             print(fd.read())
 
