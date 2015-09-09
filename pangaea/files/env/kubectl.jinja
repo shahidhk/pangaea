@@ -1,5 +1,7 @@
 {% if config['provider'] == 'gce' %}
+# Set Kubernetes apiserver ip and port
 alias kubectl='kubectl -s {{ config['helpers']['gce_apiserver_ip'] }}'
 {% elif config['provider'] == 'vagrant' %}
-unalias kubectl
+# Unset Kubernetes apiserver details, defaults to localhost:8080
+unalias kubectl 2>/dev/null
 {% endif %}

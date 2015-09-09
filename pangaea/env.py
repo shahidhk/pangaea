@@ -5,7 +5,7 @@ import argh
 import glob
 import os
 
-from pangaea.utils import pangaea_path
+from pangaea import utils
 from pangaea import compile
 
 def env(
@@ -19,7 +19,7 @@ def env(
     else:
         gpath = 'pan.'+tool+'*'
 
-    for f in glob.glob(os.path.join('pangaea/files/env/', gpath)):
+    for f in glob.glob(os.path.join(utils.pangaea_path('pangaea/files/env/'), gpath)):
         with open(f) as fd:
             print(fd.read())
 

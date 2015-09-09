@@ -62,14 +62,12 @@ def compile_file(input_f, output_d):
 
         __j = JinjaCompiler('/', context)
 
-    filename_mask = props.get()['compiler'].get('filename_mask') or '{}'
-
     path, file_name = os.path.split(input_f)
     fname, ext = os.path.splitext(file_name)
 
     if ext == '.jinja':
         os.makedirs(output_d, exist_ok=True)
-        output_f = os.path.join(output_d, filename_mask.format(fname))
+        output_f = os.path.join(output_d, 'pan.{}'.format(fname))
 
         __j.compile(input_f, output_f)
 

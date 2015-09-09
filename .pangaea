@@ -1,9 +1,8 @@
-environment: production
+environment: development
 # provider: {vagrant, gce}
-provider: gce
+provider: vagrant
 
 compiler:
-  filename_mask: 'pan.{}'
   targets:
   # - path: pangaea
   #   to: pangaea.compiled

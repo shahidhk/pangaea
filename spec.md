@@ -56,10 +56,10 @@ x change compile to be separate unit that compiles to any path
     filename mask
 x add docker gcr creds as kube pod with secrets
 x make-ca-cert use _use_gce_ value instead of curl
-- mount app folder
-    mount cloud init file for debugging
+x mount app folder
 - add hook to run kubectl yaml on cluster boot
 - add --project flag to all gcloud compute commands
+- mount cloud init file for debugging
 - expose specific port on service
 - gce mount disk
 - secure access to apiserver
