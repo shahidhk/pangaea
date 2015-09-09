@@ -1,3 +1,4 @@
 #!/bin/bash
 
 gcloud compute instances delete "{{ config['gce']['instance_name'] }}" -q
+gcloud compute project-info remove-metadata --keys user-data

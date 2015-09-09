@@ -54,11 +54,12 @@ x change compile to be separate unit that compiles to any path
     including relative and absolute paths
     compile output filename is templatable
     filename mask
-- add docker gcr creds as kube pod with secrets
-- make-ca-cert use _use_gce_ value instead of curl
+x add docker gcr creds as kube pod with secrets
+x make-ca-cert use _use_gce_ value instead of curl
 - mount app folder
     mount cloud init file for debugging
 - add hook to run kubectl yaml on cluster boot
+- add --project flag to all gcloud compute commands
 - expose specific port on service
 - gce mount disk
 - secure access to apiserver

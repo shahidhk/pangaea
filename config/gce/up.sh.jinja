@@ -3,7 +3,7 @@
 SCRIPT_DIR=`dirname $0`
 
 INSTANCE_NAME="{{ config['gce']['instance_name'] }}"
-CLOUD_CONFIG="${SCRIPT_DIR}/../../pangaea/files/coreos/self.yaml"
+CLOUD_CONFIG="{{ config['helpers']['pangaea_path']('pangaea/files/coreos/pan.self.yaml') }}"
 
 # gcloud compute project-info remove-metadata --keys user-data
 gcloud compute project-info add-metadata --metadata-from-file user-data="$CLOUD_CONFIG"

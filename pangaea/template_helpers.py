@@ -22,9 +22,8 @@ def read_file(f):
         return f.read()
 
 def kube_apiserver_ip():
-    if props.get()['provider'] == 'gce' and props.get()['environment'] == 'development':
-        # TODO: system exec gcloud # get ip address
-        pass
+    # TODO: system exec gcloud # get ip address
+    pass
 
 helpers = {}
 for f in [utils.pangaea_path, kube_secret, read_file]:

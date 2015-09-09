@@ -64,9 +64,7 @@ coreos:
       {% if config['provider'] == 'vagrant' %}
       ExecStart=/bin/bash -c '/opt/credentials/make-ca-cert.sh $DEFAULT_IPV4 IP:10.0.0.1,IP:$ETH1_IPV4'
       {% elif config['provider'] == 'gce' %}
-      ExecStart=/bin/bash -c '/opt/credentials/make-ca-cert.sh \
-        $(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip) \
-        IP:10.0.0.1,IP:$(curl -s -H Metadata-Flavor:Google http://metadata.google.internal./computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)'
+      ExecStart=/bin/bash -c '/opt/credentials/make-ca-cert.sh _use_gce_external_ip_ IP:10.0.0.1'
       {% endif %}
       RemainAfterExit=yes
       Type=oneshot
