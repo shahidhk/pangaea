@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: gcr-docker-credentials
+  labels:
+    version: v1
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        version: v1
+    spec:
+      containers:
+        - image: hasura/google-jwt-gcr-token
+          name: gcr-docker-credentials
+          env:
+            - name: GOOGLE_SA_FILE
+              value: /token/auth-file/json
+            - name: DOCKER_GCR_REFRESH
+              value: '50'
+          volumeMounts:
+            - name: kubelet-docker-config
+              mountPath: /token/.dockercfg
+            - name: google-sa-auth
+              mountPath: /token/auth-file
+      volumes:
+        - name: kubelet-docker-config
+          hostPath:
+            path: /var/lib/kubelet/.dockercfg
+        - name: google-sa-auth
+          secret:
+            secretName: google-sa-auth

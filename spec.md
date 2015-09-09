@@ -55,8 +55,10 @@ x change compile to be separate unit that compiles to any path
     compile output filename is templatable
     filename mask
 - add docker gcr creds as kube pod with secrets
-    do:
-      run fleet docker, that talks to apiserver through its secure port, library
+- make-ca-cert use _use_gce_ value instead of curl
+- mount app folder
+    mount cloud init file for debugging
+- add hook to run kubectl yaml on cluster boot
 - expose specific port on service
 - gce mount disk
 - secure access to apiserver
