@@ -1,0 +1,25 @@
+#!/bin/bash
+
+SCRIPT_DIR=`dirname $0`
+WRAPPER="$SCRIPT_DIR/pan.kubectl.sh"
+
+for i in "{{ config['helpers']['pangaea_path']('pangaea/files/kubernetes') }}"/*; do
+
+  if [[ $i = "{{ config['helpers']['pangaea_path']('pangaea/files/kubernetes/docker-gcr-credentials') }}" ]]; then
+
+    {% if config['pangaea']['docker_gcr_credentials'] %}
+
+    $WRAPPER create -f "{{ config['helpers']['pangaea_path']('app/secrets') }}"
+    $WRAPPER create -f $i
+
+    {% else %}
+    :
+    {% endif %}
+
+  else
+
+    $WRAPPER create -f $i
+
+  fi
+
+done

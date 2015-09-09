@@ -227,7 +227,7 @@ write-files:
   content: |
     #!/bin/bash
     systemctl status
-{% if config['coreos']['docker_gcr_credentials'] %}
+{% if config['pangaea']['docker_gcr_credentials'] %}
 - path: /var/lib/kubelet/.dockercfg
   permissions: '0644'
 {% endif %}

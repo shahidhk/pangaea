@@ -102,7 +102,7 @@ Vagrant.configure("2") do |config|
       ip = "172.17.8.#{i+100}"
       config.vm.network :private_network, ip: ip
 
-      {% if config['provider'] == 'vagrant' and config['environment'] == 'development' %}
+      {% if config['environment'] == 'development' %}
       $shared_folders['{{ config['helpers']['pangaea_path']('.') }}'] = '/pangaea'
       {% endif %}
 
@@ -117,6 +117,13 @@ Vagrant.configure("2") do |config|
       # provision coreos machine
       config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"
       config.vm.provision :shell, :inline => "mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/", :privileged => true
+
+      print "Vagrant machine is provisioned"
+
+      {% if config['pangaea']['enable_kubesystem'] %}
+        #
+        print "Kubesystem initialized"
+      {% endif %}
 
     end
   end

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+FLAGS=""
+
+{% if config['provider'] == 'gce' %}
+FLAGS=$FLAGS" -s {{ config['helpers']['gce_apiserver_ip']() }}"
+{% endif %}
+
+kubectl $FLAGS $@
