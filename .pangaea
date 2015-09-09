@@ -17,6 +17,6 @@ kubernetes:
 coreos:
   docker_gcr_credentials:
     enable: true
-    auth_file: app/tfc-glassic-26ed654d33b7.json
+    auth_file: app/secrets/tfc-glassic-26ed654d33b7.json
 gce:
   instance_name: testinstance
