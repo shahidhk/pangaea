@@ -23,9 +23,9 @@ def read_file(f):
         return f.read()
 
 def kube_running():
-    ksh = pangaea_path('pangaea/files/stubs/pan.kubectl.sh')
-    subprocess.call('chmod +x {}'.format(ksh))
-    nodes = subprocess.check_output('{} get no -o yaml'.format(ksh))
+    ksh = utils.pangaea_path('pangaea/files/stubs/pan.kubectl.sh')
+    subprocess.call('chmod +x {}'.format(ksh), shell=True)
+    nodes = subprocess.check_output('{} get no -o json'.format(ksh), shell=True)
     nodes = json.loads(nodes.decode('utf-8'))
     if len(nodes['items']) > 0:
         return True

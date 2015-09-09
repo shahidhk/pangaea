@@ -3,9 +3,7 @@ import shutil
 import glob
 import argh
 
-from pangaea import utils
-from pangaea import template_helpers
-from pangaea import props
+from pangaea import utils, props, helpers
 
 __j = None # Jinja compiler
 
@@ -57,7 +55,7 @@ def compile_file(input_f, output_d):
     if __j is None:
         context = props.get()
 
-        context['helpers'] = template_helpers.helpers
+        context['helpers'] = helpers.helpers
         context['helpers']['compile'] = compile
 
         __j = JinjaCompiler('/', context)
