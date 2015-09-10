@@ -18,4 +18,5 @@ pangaea:
   docker_gcr_credentials:
     auth_file: app/secrets/tfc-glassic-26ed654d33b7.json
 gce:
+  project_name: tfc-glassic
   instance_name: testinstance

@@ -21,10 +21,17 @@ while True:
     else:
         time.sleep(1)
 
-kctl = utils.pangaea_path('pangaea/files/stubs/kubectl.py')
+def create_kubernetes_object(o):
+    kctl = utils.pangaea_path('pangaea/files/stubs/kubectl.py')
+    subprocess.call('{} create -f "{}" 2>/dev/null'.format(kctl, o), shell=True)
+
+# create secrets
+create_kubernetes_object(utils.pangaea_path('app/secrets'))
+
+# create basic services
 ppath = utils.pangaea_path('pangaea/files/kubernetes')
 for i in os.listdir(ppath):
     if i != 'docker-gcr-credentials' or props.get()['pangaea']['docker_gcr_credentials']:
-        nodes = subprocess.call('{} create -f "{}" 2>/dev/null'.format(kctl, os.path.join(ppath, i)), shell=True)
+        nodes = create_kubernetes_object(os.path.join(ppath, i))
 
 print("Kubesystem initialized")
