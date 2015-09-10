@@ -57,6 +57,7 @@ x change compile to be separate unit that compiles to any path
 x add docker gcr creds as kube pod with secrets
 x make-ca-cert use _use_gce_ value instead of curl
 x mount app folder
+- kubesystem bootstrap secrets
 - add hook to run kubectl yaml on cluster boot
 - add --project flag to all gcloud compute commands
 - mount cloud init file for debugging
@@ -67,6 +68,10 @@ x mount app folder
 - vagrant mount permissions
 - persistent storage for logging and monitoring
 - helpers for path in templates, such as for mounting
+- package as pip
+- documentation
+    docs
+    basic tooling
 
 later
 - fix the utter mess with paths

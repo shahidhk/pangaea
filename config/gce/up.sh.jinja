@@ -14,7 +14,7 @@ gcloud compute instances create $INSTANCE_NAME \
   --boot-disk-size 20GB \
   --boot-disk-type pd-ssd
 
-{% if config['environment'] == 'development'  %}
+{% if config['environment'] == 'development' %}
 gcloud compute --project "tfc-glassic" firewall-rules create "kubeapiserver-8080" --allow tcp:8080 --description "kubernetes api server for kubectl" --network "default"
 {% endif %}
 

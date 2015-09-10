@@ -1,6 +1,6 @@
 environment: development
 # provider: {vagrant, gce}
-provider: gce
+provider: vagrant
 
 compiler:
   targets:

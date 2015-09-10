@@ -23,6 +23,43 @@ $forwarded_ports = {}
 
 require CONFIG
 
+{% if config['pangaea']['enable_kubesystem'] %}
+# http://stackoverflow.com/questions/21890104/run-code-in-vagrantfile-only-if-provisioning
+class EchoPlugin < Vagrant.plugin('2')
+  class KubeSystemAction
+    def initialize(app, env)
+      @app = app
+    end
+
+    def call(env)
+      require 'Open3'
+
+      @app.call(env)
+
+      puts "Vagrant machine is provisioned"
+      puts "Waiting for Kubernetes to boot to initialize kubesystem"
+
+      Open3.popen2e('{{ config['helpers']['pangaea_path']('pangaea/files/stubs/kubesystem.py') }}') do |i, oe, t|
+        # Thread.new do
+        #   oe.each {|l| puts l }
+        # end
+
+        i.close
+        t.value
+      end
+
+      puts "Kubesystem initialized"
+    end
+  end
+
+  name 'kubesystem'
+
+  action_hook 'kubesystem' do |hook|
+    hook.before Vagrant::Action::Builtin::Provision, KubeSystemAction
+  end
+end
+{% endif %}
+
 Vagrant.configure("2") do |config|
   # always use Vagrants insecure key
   config.ssh.insert_key = false
@@ -117,13 +154,6 @@ Vagrant.configure("2") do |config|
       # provision coreos machine
       config.vm.provision :file, :source => "#{CLOUD_CONFIG_PATH}", :destination => "/tmp/vagrantfile-user-data"
       config.vm.provision :shell, :inline => "mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/", :privileged => true
-
-      print "Vagrant machine is provisioned"
-
-      {% if config['pangaea']['enable_kubesystem'] %}
-        #
-        print "Kubesystem initialized"
-      {% endif %}
 
     end
   end
