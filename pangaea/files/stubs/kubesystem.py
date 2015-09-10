@@ -13,15 +13,18 @@ from pangaea import utils, props, helpers
 import subprocess, json, time
 
 # wait for kube apiserver
+print("Waiting for Kubernetes to boot to initialize kubesystem")
+
 while True:
     if helpers.kube_running():
         break
     else:
-        print("... Waiting for Kubernetes boot")
         time.sleep(1)
 
-ksh = utils.pangaea_path('pangaea/files/stubs/pan.kubectl.sh')
+kctl = utils.pangaea_path('pangaea/files/stubs/kubectl.py')
 ppath = utils.pangaea_path('pangaea/files/kubernetes')
 for i in os.listdir(ppath):
     if i != 'docker-gcr-credentials' or props.get()['pangaea']['docker_gcr_credentials']:
-        nodes = subprocess.call('{} create -f "{}"'.format(ksh, os.path.join(ppath, i)), shell=True)
+        nodes = subprocess.call('{} create -f "{}" 2>/dev/null'.format(kctl, os.path.join(ppath, i)), shell=True)
+
+print("Kubesystem initialized")

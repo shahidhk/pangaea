@@ -37,7 +37,6 @@ class EchoPlugin < Vagrant.plugin('2')
       @app.call(env)
 
       puts "Vagrant machine is provisioned"
-      puts "Waiting for Kubernetes to boot to initialize kubesystem"
 
       Open3.popen2e('{{ config['helpers']['pangaea_path']('pangaea/files/stubs/kubesystem.py') }}') do |i, oe, t|
         # Thread.new do
@@ -48,7 +47,6 @@ class EchoPlugin < Vagrant.plugin('2')
         t.value
       end
 
-      puts "Kubesystem initialized"
     end
   end
 

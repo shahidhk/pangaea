@@ -1,3 +1,2 @@
-P='{{ config['helpers']['pangaea_path']('pangaea/files/stubs/pan.kubectl.sh') }}'
-chmod +x "$P"
-alias kubectl="$P"
+# alias kubectl to wrapper script to include kubernetes apiserver ip address
+alias kubectl='{{ config['helpers']['pangaea_path']('pangaea/files/stubs/kubectl.py') }}'

@@ -18,6 +18,7 @@ gcloud compute instances create $INSTANCE_NAME \
 gcloud compute --project "tfc-glassic" firewall-rules create "kubeapiserver-8080" --allow tcp:8080 --description "kubernetes api server for kubectl" --network "default"
 {% endif %}
 
+echo
 echo "###############################################"
 echo
 echo "The Kubernetes compute instance is now booting."
@@ -25,3 +26,14 @@ echo "If asked for an ssh password, wait for the instance to boot and try again.
 echo "gcloud compute ssh core@$INSTANCE_NAME"
 echo
 echo "###############################################"
+echo
+
+{% if config['pangaea']['enable_kubesystem'] %}
+
+{{ config['helpers']['pangaea_path']('pangaea/files/stubs/kubesystem.py') }}
+
+echo
+echo "###############################################"
+echo
+
+{% endif %}

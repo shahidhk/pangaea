@@ -23,20 +23,22 @@ def read_file(f):
         return f.read()
 
 def kube_running():
-    ksh = utils.pangaea_path('pangaea/files/stubs/pan.kubectl.sh')
-    subprocess.call('chmod +x {}'.format(ksh), shell=True)
+    kctl = utils.pangaea_path('pangaea/files/stubs/kubectl.py')
 
     try:
-        nodes = subprocess.check_output('{} get no -o json'.format(ksh), shell=True)
-        #nodes = subprocess.check_output(ksh, 'get no -o json')
+        nodes = subprocess.check_output('{} get no -o json 2>/dev/null'.format(kctl), shell=True)
         nodes = json.loads(nodes.decode('utf-8'))
         if len(nodes['items']) > 0:
             return True
-    except subprocess.CalledProcessError: # kubectl error code
+    except ValueError: # json parse error
+        pass
+    except subprocess.CalledProcessError: # kubectl error code, not ready or not found
         pass
 
     return False
 
+class KubeIPNotFound(Exception):
+    pass
 def kube_apiserver_ip():
     if props.get()['provider'] == 'vagrant':
         return '127.0.0.1:8080'
@@ -48,9 +50,9 @@ def kube_apiserver_ip():
             if i['name'] == props.get()['gce']['instance_name']:
                 return i['networkInterfaces'][0]['accessConfigs'][0]['natIP'] + ':8080'
 
-        raise Exception('GCE instance {} not found'.format(props.get()['gce']['instance_name']))
+        raise KubeIPNotFound('GCE instance {} not found'.format(props.get()['gce']['instance_name']))
 
 helpers = {}
 for f in [utils.pangaea_path, kube_secret, read_file]:
     helpers[f.__name__] = f
-    helpers['gce_apiserver_ip'] = kube_apiserver_ip
+    helpers['kube_apiserver_ip'] = kube_apiserver_ip
