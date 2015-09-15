@@ -1,65 +1,5 @@
-# Spec #
-
-Uniform interface
-Idempotent operations
-Local configuration must not be checked in, must not conflict
-Secrets management
-Templated everything, parameters and include other templates
-
-# Folder structure #
-
-/
-/pan +x
-/.pangaea # pangaea-folder-contents-but-compiled
-/pangaea # python module
-  /providers
-    /vagrant/Vagrantfile
-    /gce/bootstrap.sh
-  /compile
-  /props
-  /examples
-    /app.example
-  /files
-    /coreos
-      /self.yaml
-    /kubernetes
-      /monitoring
-    /logging
-/config
-  /vagrant_config.rb # refactor most into Vagrantfile
-  /sample.config
-  /development.config
-  /production.config
-/app
-  /secrets
-    account.key
-  /service1
-    /
-
-# Config file #
-
-- provider
-- parameters
-
 # TODO #
 
-x Download archive then extract binaries
-x dns server
-x compilation target parameter
-x replace env with template + env var strings
-x gce support -test
-x template coreos cloud config: ip addr, dns for kubelet
-x refactor compile
-x change compile to be separate unit that compiles to any path
-    including relative and absolute paths
-    compile output filename is templatable
-    filename mask
-x add docker gcr creds as kube pod with secrets
-x make-ca-cert use _use_gce_ value instead of curl
-x mount app folder
-x add hook to run kubectl yaml on cluster boot
-x add --project flag to all gcloud compute commands
-x kubesystem bootstrap secrets
 - expose specific port on service
 - gce mount disk
 - vagrant mount permissions
@@ -79,64 +19,24 @@ later
 - automatically mount caches for stuff like docker, archive file
 - Dockerfile builds. understand current workflow
 
-redefine.
-
-template compiler
-  parameter based config
-  template helpers
-scripts
-  print env variables
-    templated
-      info: current config files, status
-      all
-        if env is dev then vagrant else gce
-      vagrant
-    wrapper script calls template() then calls rendered script
-components
-  setup
-    coreos
-      self.yaml
-    kubernetes
-      monitoring
-      logging
-      dns
-      template and call kubectl
-    vagrant
-      vagrantfile
-      vagrant.rb
-    gce
-      up
-      down
-  env
-    vagrant
-    fleetctl
-    kubectl
-    gcloud
-    nfs
-    docker
-    ssh
-  #
-
-# Templating
-
-output to the same directory
-  always run pan compile
-    idempotent
-  option: prefix ".pan"
-  so include ".pan" paths insteadj
-
-
 # Pangaea command line tool
 
 $PANGAEA_ENVIRONMENT = 'development.yaml'
 
 pangaea
   cluster
-    status start stop reboot
-    node
+    status start stop reboot [todo maybe]
+    node [todo]
       add remove reboot
   env
     # produce eval-able output
     all
-      # $PAN to pangaea_path so we can do things like create -f $PAN/app/something
-    kubectl docker gcloud vagrant nfs ssh fleetctl
+    [components]
+      vagrant
+      fleetctl
+      kubectl
+      gcloud
+      nfs
+      docker
+      ssh
+
