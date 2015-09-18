@@ -32,7 +32,7 @@ class EchoPlugin < Vagrant.plugin('2')
     end
 
     def call(env)
-      require 'Open3'
+      require 'open3'
 
       @app.call(env)
 

@@ -1,6 +1,7 @@
-environment: production
+# environment: {development, production}
+environment: development
 # provider: {vagrant, gce}
-provider: gce
+provider: vagrant
 
 compiler:
   targets:

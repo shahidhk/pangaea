@@ -1,2 +1,4 @@
+{% if config['provider'] == 'vagrant' %}
 # Vagrant working directory
 export VAGRANT_CWD="{{ config['helpers']['pangaea_path']('pangaea/files/vagrant') }}"
+{% endif %}

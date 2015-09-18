@@ -1,2 +1,4 @@
+{% if config['provider'] == 'gce' %}
 # Set gcloud project
 gcloud config set project "{{ config['gce']['project_name'] }}"
+{% endif %}

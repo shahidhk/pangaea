@@ -11,6 +11,12 @@
     basic tooling
 - complete env tooling
 
+- requirements installer
+    gcloud, kubectl, vagrant
+- compile outputs list of files
+- broken pipe on env, env.py:24 stdout write vs print
+- restarting vagrant box must not re-download files
+
 later
 - mount cloud init file for debugging
 - secure access to apiserver
