@@ -1,9 +1,13 @@
 # TODO #
 
-- expose specific port on service
+- expose specific port on service, port 80
 - gce mount disk
+- logging and monitoring on google stuff
+
 - vagrant mount permissions
 - persistent storage for logging and monitoring
+- logrotate logging and monitoring storage
+
 - merge config and pangaea/files
 - package as pip
 - documentation

@@ -77,26 +77,7 @@ coreos:
       After=network-online.target
 
       [Service]
-      ExecStartPre=-/usr/bin/mkdir -p /opt/bin
-      ExecStartPre=/usr/bin/curl -L -o /opt/kubernetes.tar.gz https://github.com/kubernetes/kubernetes/releases/download/v1.0.4/kubernetes.tar.gz
-      ExecStartPre=/bin/tar -xzf /opt/kubernetes.tar.gz -C /opt/
-      ExecStartPre=/bin/tar -xzf /opt/kubernetes/server/kubernetes-server-linux-amd64.tar.gz -C /opt/kubernetes/server/
-      ExecStartPre=/bin/bash -c ' \
-        echo "linking kubernetes binaries to /opt/bin" && \
-        ln -s /opt/kubernetes/server/kubernetes/server/bin/kube-apiserver /opt/bin/kube-apiserver && \
-        ln -s /opt/kubernetes/server/kubernetes/server/bin/kube-controller-manager /opt/bin/kube-controller-manager && \
-        ln -s /opt/kubernetes/server/kubernetes/server/bin/kube-proxy /opt/bin/kube-proxy && \
-        ln -s /opt/kubernetes/server/kubernetes/server/bin/kube-scheduler /opt/bin/kube-scheduler && \
-        ln -s /opt/kubernetes/server/kubernetes/server/bin/kubelet /opt/bin/kubelet && \
-        ln -s /opt/kubernetes/platforms/linux/amd64/kubectl /opt/bin/kubectl'
-      ExecStart=/bin/bash -c ' \
-        echo "setting executable flag on kubernetes binaries" && \
-        /usr/bin/chmod +x /opt/bin/kube-apiserver && \
-        /usr/bin/chmod +x /opt/bin/kube-controller-manager && \
-        /usr/bin/chmod +x /opt/bin/kube-proxy && \
-        /usr/bin/chmod +x /opt/bin/kube-scheduler && \
-        /usr/bin/chmod +x /opt/bin/kubelet && \
-        /usr/bin/chmod +x /opt/bin/kubectl'
+      ExecStart=/opt/bin/kube-binaries.sh
       RemainAfterExit=yes
       Type=oneshot
   - name: kube-apiserver.service
@@ -217,6 +198,32 @@ write-files:
         sleep 1 && echo .;
       done;
     exit $?
+- path: /opt/bin/kube-binaries.sh
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    set -e
+    # idempotent
+    [ ! -x /opt/bin/kubectl ] || exit 0
+    # download, link, set executable
+    mkdir -p /opt/bin
+    curl -L -o /opt/kubernetes.tar.gz https://github.com/kubernetes/kubernetes/releases/download/v1.0.4/kubernetes.tar.gz
+    tar -xzf /opt/kubernetes.tar.gz -C /opt/
+    tar -xzf /opt/kubernetes/server/kubernetes-server-linux-amd64.tar.gz -C /opt/kubernetes/server/
+    echo 'linking kubernetes binaries to /opt/bin'
+    ln -s /opt/kubernetes/server/kubernetes/server/bin/kube-apiserver /opt/bin/kube-apiserver
+    ln -s /opt/kubernetes/server/kubernetes/server/bin/kube-controller-manager /opt/bin/kube-controller-manager
+    ln -s /opt/kubernetes/server/kubernetes/server/bin/kube-proxy /opt/bin/kube-proxy
+    ln -s /opt/kubernetes/server/kubernetes/server/bin/kube-scheduler /opt/bin/kube-scheduler
+    ln -s /opt/kubernetes/server/kubernetes/server/bin/kubelet /opt/bin/kubelet
+    ln -s /opt/kubernetes/platforms/linux/amd64/kubectl /opt/bin/kubectl
+    echo 'setting executable flag on kubernetes binaries'
+    chmod +x /opt/bin/kube-apiserver
+    chmod +x /opt/bin/kube-controller-manager
+    chmod +x /opt/bin/kube-proxy
+    chmod +x /opt/bin/kube-scheduler
+    chmod +x /opt/bin/kubelet
+    chmod +x /opt/bin/kubectl
 - path: /opt/bin/ws
   permissions: '0755'
   content: |
