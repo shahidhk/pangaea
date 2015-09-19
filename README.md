@@ -25,6 +25,7 @@ A usable workflow enabled by
 
 ## TODO
 
+- use scripts from https://github.com/coreos/coreos-kubernetes instead
 - See the file `spec.md`
 - Better documentation, and setting up the environment for more tools is a priority
 
