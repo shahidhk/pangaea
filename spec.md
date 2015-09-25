@@ -36,7 +36,7 @@ logging and monitoring
 - complete env tooling
 
 - requirements installer
-    gcloud, kubectl, vagrant, nfsd
+    gcloud, kubectl, vagrant, nfsd, jq
 - compile outputs list of files
 - broken pipe on env, env.py:24 stdout write vs print
 - test on

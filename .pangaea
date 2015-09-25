@@ -1,3 +1,8 @@
-node:
-  roles:
-    etcd: true
+#!/bin/bash
+
+# OPTIONS
+# ENVIRONMENT={development, production}
+ENVIRONMENT=developmentfi
+
+# GCE
+GCE_INSTANCE_NAME=testinstance

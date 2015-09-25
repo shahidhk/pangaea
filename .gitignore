@@ -1,9 +1,11 @@
 .tmp
 
-pangaea/pki/vagrant
+pangaea/pki/keys
 
 pangaea/vagrant/.vagrant
+
 pangaea/vagrant/.srl
+pangaea/gce/.srl
 
 *.pyc
 

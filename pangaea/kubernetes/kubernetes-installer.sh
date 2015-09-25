@@ -36,7 +36,7 @@ function init_config {
     local REQUIRED=('ADVERTISE_IP' 'POD_NETWORK' 'ETCD_ENDPOINTS' 'SERVICE_IP_RANGE' 'K8S_SERVICE_IP' 'DNS_SERVICE_IP' 'K8S_VER' )
 
     if [ -z $ADVERTISE_IP ]; then
-        export ADVERTISE_IP=$(awk -F= '/COREOS_PUBLIC_IPV4/ {print $2}' /etc/environment)
+        export ADVERTISE_IP=$(awk -F= '/COREOS_PRIVATE_IPV4/ {print $2}' /etc/environment)
     fi
 
     for REQ in "${REQUIRED[@]}"; do
@@ -48,22 +48,37 @@ function init_config {
 }
 
 function init_binaries {
-    [ ! -x /usr/bin/kubectl ] || return 0
+    [ ! -x /opt/bin/kubectl ] || return 0
 
     local CWD=/pangaea/.tmp
 
-    mkdir -p $CWD
-    curl -L -o $CWD/kubernetes.tar.gz https://github.com/kubernetes/kubernetes/releases/download/$K8S_VER/kubernetes.tar.gz
+    if [ ! -e $CWD/kubernetes/server/kubernetes/server/bin/kubelet ]; then
+        mkdir -p $CWD
+        curl -L -o $CWD/kubernetes.tar.gz https://github.com/kubernetes/kubernetes/releases/download/$K8S_VER/kubernetes.tar.gz
 
-    tar -xzf $CWD/kubernetes.tar.gz -C $CWD/
-    tar -xzf $CWD/kubernetes/server/kubernetes-server-linux-amd64.tar.gz -C $CWD/kubernetes/server/
+        tar -xzf $CWD/kubernetes.tar.gz -C $CWD/
+        tar -xzf $CWD/kubernetes/server/kubernetes-server-linux-amd64.tar.gz -C $CWD/kubernetes/server/
+    fi
 
-    rm /usr/bin/kubelet
-    ln -s $CWD/kubernetes/server/kubernetes/server/bin/kubelet /usr/bin/kubelet
-    ln -s $CWD/kubernetes/platforms/linux/amd64/kubectl /usr/bin/kubectl
+    mkdir -p /opt/bin
 
-    chmod +x /usr/bin/kubelet
-    chmod +x /usr/bin/kubectl
+    rm -f /opt/bin/kubelet
+    rm -f /opt/bin/kubectl
+
+    ln -s $CWD/kubernetes/server/kubernetes/server/bin/kubelet /opt/bin/kubelet
+    ln -s $CWD/kubernetes/platforms/linux/amd64/kubectl /opt/bin/kubectl
+
+    chmod +x /opt/bin/kubelet
+    chmod +x /opt/bin/kubectl
+}
+
+function init_ssl {
+    while [ ! -e /tmp/ssl.tar ]
+    do
+      sleep 2
+    done
+    mkdir -p /etc/kubernetes/ssl
+    tar -C /etc/kubernetes/ssl -xf /tmp/ssl.tar
 }
 
 function init_flannel {
@@ -97,7 +112,7 @@ function init_templates {
         cat << EOF > $TEMPLATE
 [Service]
 ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
-ExecStart=/usr/bin/kubelet \
+ExecStart=/opt/bin/kubelet \
   --api_servers=http://127.0.0.1:8080 \
   --register-node=true \
   --allow-privileged=true \
@@ -529,6 +544,7 @@ function start_addons {
 
 init_config
 init_binaries
+init_ssl
 init_templates
 systemctl enable etcd2; systemctl start etcd2
 
