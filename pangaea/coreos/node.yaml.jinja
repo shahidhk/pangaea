@@ -1,0 +1,302 @@
+#cloud-config
+
+---
+hostname: kubemachine
+coreos:
+  update:
+    reboot-strategy: "off"
+
+  {% if config['roles']['etcd'] %}
+  etcd2:
+    name: kubemachine
+    initial-cluster: kubemachine=http://$private_ipv4:2380
+    advertise-client-urls: http://$private_ipv4:2379
+    listen-client-urls: http://0.0.0.0:2379
+    initial-advertise-peer-urls: http://$private_ipv4:2380
+    listen-peer-urls: http://$private_ipv4:2380
+  {% endif %}
+
+  fleet:
+    metadata: role=kubemachine
+
+  units:
+
+    {% if config['roles']['etcd'] %}
+    - name: etcd2.service
+      command: start
+    {% endif %}
+    - name: fleet.service
+      command: start
+    {% if config['roles']['controller'] %}
+    - name: flanneld.service
+      command: start
+      drop-ins:
+      - name: 50-network-config.conf
+        content: |
+          [Unit]
+          Requires=etcd2.service
+          [Service]
+          ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.2.0.0/16", "Backend": {"Type": "vxlan"}}'
+    {% endif %}
+    - name: TODO-generate-credentials
+    - name: kubelet.service
+      command: start
+      content: |
+        [Service]
+        EnvironmentFile=/etc/environment
+        ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
+        ExecStart=/usr/bin/kubelet \
+          --api_servers={{ config['kubesetup']['controllers'] || http://127.0.0.1:8080 }} \
+          --register-node={{ config['roles']['worker'] || true }} \
+          --allow-privileged=true \
+          --config=/etc/kubernetes/manifests \
+          --hostname-override=$public_ipv4 \
+          --cluster_dns={{ config['kubernetes']['dns_server_ip'] }} \
+          --cluster_domain={{ config['kubernetes']['dns_domain'] }} \
+          {% if config['roles']['worker'] %}
+          --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
+          --tls-cert-file=/etc/kubernetes/ssl/worker.pem \
+          --tls-private-key-file=/etc/kubernetes/ssl/worker-key.pem \
+          {% endif %}
+          --cadvisor-port=0
+        Restart=always
+        RestartSec=10
+
+        [Install]
+        WantedBy=multi-user.target
+
+write-files:
+  {% if config['roles']['worker'] %}
+  - path: /etc/kubernetes/kubeconfig.yaml
+    content: |
+      apiVersion: v1
+      kind: Config
+      clusters:
+      - name: local
+        cluster:
+          certificate-authority: /etc/kubernetes/ssl/ca.pem
+      users:
+      - name: kubelet
+        user:
+          client-certificate: /etc/kubernetes/ssl/worker.pem
+          client-key: /etc/kubernetes/ssl/worker-key.pem
+      contexts:
+      - context:
+          cluster: local
+          user: kubelet
+        name: kubelet-context
+      current-context: kubelet-context
+  {% endif %}
+  - path: /etc/kubernetes/manifests/kube-proxy.yaml
+    content: |
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: kube-proxy
+        namespace: kube-system
+      spec:
+        hostNetwork: true
+        containers:
+        - name: kube-proxy
+          image: gcr.io/google_containers/hyperkube:{{ config['kubernetes']['version'] }}
+          command:
+          - /hyperkube
+          - proxy
+          - --master={{ config['kubesetup']['controllers'] }}
+          {% if config['roles']['worker'] %}
+          - --kubeconfig=/etc/kubernetes/kubeconfig.yaml
+          {% endif %}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /etc/ssl/certs
+              name: ssl-certs
+            {% if config['roles']['worker'] %}
+            - mountPath: /etc/kubernetes/kubeconfig.yaml
+              name: kubeconfig
+              readOnly: true
+            - mountPath: /etc/kubernetes/ssl
+              name: etc-kube-ssl
+              readOnly: true
+            {% endif %}
+        volumes:
+          - name: ssl-certs
+            hostPath:
+              path: /usr/share/ca-certificates
+          {% if config['roles']['worker'] %}
+          - name: kubeconfig
+            hostPath:
+              path: /etc/kubernetes/kubeconfig.yaml
+          - name: etc-kube-ssl
+            hostPath:
+              path: /etc/kubernetes/ssl
+          {% endif %}
+  {% if config['roles']['controller'] %}
+  - path: /etc/kubernetes/manifests/kube-apiserver.yaml
+    content: |
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: kube-apiserver
+        namespace: kube-system
+      spec:
+        hostNetwork: true
+        containers:
+        - name: kube-apiserver
+          image: gcr.io/google_containers/hyperkube:{{ config['kubernetes']['version'] }}
+          command:
+          - /hyperkube
+          - apiserver
+          - --bind-address=0.0.0.0
+          - --etcd_servers={{ config['kubesetup']['etcd_endpoints'] }}
+          - --allow-privileged=true
+          - --service-cluster-ip-range={{ config['kubernetes']['service_ip_range'] }}
+          - --secure_port=443
+          - --advertise-address=$public_ipv4
+          - --admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota
+          - --tls-cert-file=/etc/kubernetes/ssl/apiserver.pem
+          - --tls-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem
+          - --client-ca-file=/etc/kubernetes/ssl/ca.pem
+          - --service-account-key-file=/etc/kubernetes/ssl/apiserver-key.pem
+          ports:
+          - containerPort: 443
+            hostPort: 443
+            name: https
+          - containerPort: 8080
+            hostPort: 8080
+            name: local
+          volumeMounts:
+          - mountPath: /etc/kubernetes/ssl
+            name: ssl-certs-kubernetes
+            readOnly: true
+          - mountPath: /etc/ssl/certs
+            name: ssl-certs-host
+            readOnly: true
+        volumes:
+        - hostPath:
+            path: /etc/kubernetes/ssl
+          name: ssl-certs-kubernetes
+        - hostPath:
+            path: /usr/share/ca-certificates
+          name: ssl-certs-host
+  - path: /etc/kubernetes/manifests/kube-podmaster.yaml
+    content: |
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: kube-podmaster
+        namespace: kube-system
+      spec:
+        hostNetwork: true
+        containers:
+        - name: scheduler-elector
+          image: gcr.io/google_containers/podmaster:1.1
+          command:
+          - /podmaster
+          - --etcd-servers={{ config['kubesetup']['etcd_endpoints'] }}
+          - --key=scheduler
+          - --whoami=$public_ipv4
+          - --source-file=/src/manifests/kube-scheduler.yaml
+          - --dest-file=/dst/manifests/kube-scheduler.yaml
+          volumeMounts:
+          - mountPath: /src/manifests
+            name: manifest-src
+            readOnly: true
+          - mountPath: /dst/manifests
+            name: manifest-dst
+        - name: controller-manager-elector
+          image: gcr.io/google_containers/podmaster:1.1
+          command:
+          - /podmaster
+          - --etcd-servers={{ config['kubesetup']['etcd_endpoints'] }}
+          - --key=controller
+          - --whoami=$public_ipv4
+          - --source-file=/src/manifests/kube-controller-manager.yaml
+          - --dest-file=/dst/manifests/kube-controller-manager.yaml
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /src/manifests
+            name: manifest-src
+            readOnly: true
+          - mountPath: /dst/manifests
+            name: manifest-dst
+        volumes:
+        - hostPath:
+            path: /srv/kubernetes/manifests
+          name: manifest-src
+        - hostPath:
+            path: /etc/kubernetes/manifests
+          name: manifest-dst
+  - path: /srv/kubernetes/manifests/kube-controller-manager.yaml
+    content: |
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: kube-controller-manager
+        namespace: kube-system
+      spec:
+        containers:
+        - name: kube-controller-manager
+          image: gcr.io/google_containers/hyperkube:{{ config['kubernetes']['version'] }}
+          command:
+          - /hyperkube
+          - controller-manager
+          - --master=http://127.0.0.1:8080
+          - --service-account-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem
+          - --root-ca-file=/etc/kubernetes/ssl/ca.pem
+          livenessProbe:
+            httpGet:
+              host: 127.0.0.1
+              path: /healthz
+              port: 10252
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+          volumeMounts:
+          - mountPath: /etc/kubernetes/ssl
+            name: ssl-certs-kubernetes
+            readOnly: true
+          - mountPath: /etc/ssl/certs
+            name: ssl-certs-host
+            readOnly: true
+        hostNetwork: true
+        volumes:
+        - hostPath:
+            path: /etc/kubernetes/ssl
+          name: ssl-certs-kubernetes
+        - hostPath:
+            path: /usr/share/ca-certificates
+          name: ssl-certs-host
+  - path: /srv/kubernetes/manifests/kube-scheduler.yaml
+    content: |
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: kube-scheduler
+        namespace: kube-system
+      spec:
+        hostNetwork: true
+        containers:
+        - name: kube-scheduler
+          image: gcr.io/google_containers/hyperkube:{{ config['kubernetes']['version'] }}
+          command:
+          - /hyperkube
+          - scheduler
+          - --master=http://127.0.0.1:8080
+          livenessProbe:
+            httpGet:
+              host: 127.0.0.1
+              path: /healthz
+              port: 10251
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+  - path: /srv/kubernetes/manifests/kube-system.json
+    content: |
+      {
+        "apiVersion": "v1",
+        "kind": "Namespace",
+        "metadata": {
+          "name": "kube-system"
+        }
+      }
+  {% endif %}
+

@@ -74,3 +74,33 @@ pangaea
       nfs
       docker
       ssh
+
+# Workflow
+
+- operation
+    bootstrap, add node, remove node
+    clustering handled differently on each
+- provision node
+    compile templates
+    provisioner script
+
+# Workflow
+
+- provision node
+    vagrant provision / gcloud create instance
+- etcd nodes
+    get list of all compute ip (offline)
+    contact first successful that allows fleetctl
+    find etcd servers
+    verify cluster name
+    optional: etcdctl to modify etcd cluster
+    get etcd nodes for templating
+- template systemd units (kubelet, etcd)
+    based on roles, specify offline
+    node environment
+      systemd environmentfile
+- template other files
+    pod manifests, kubeconfig files
+    roles, offline
+    node environment
+      bash based compiler
