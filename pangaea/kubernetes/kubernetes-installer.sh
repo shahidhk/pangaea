@@ -47,6 +47,25 @@ function init_config {
     done
 }
 
+function init_binaries {
+    [ ! -x /usr/bin/kubectl ] || return 0
+
+    local CWD=/pangaea/.tmp
+
+    mkdir -p $CWD
+    curl -L -o $CWD/kubernetes.tar.gz https://github.com/kubernetes/kubernetes/releases/download/$K8S_VER/kubernetes.tar.gz
+
+    tar -xzf $CWD/kubernetes.tar.gz -C $CWD/
+    tar -xzf $CWD/kubernetes/server/kubernetes-server-linux-amd64.tar.gz -C $CWD/kubernetes/server/
+
+    rm /usr/bin/kubelet
+    ln -s $CWD/kubernetes/server/kubernetes/server/bin/kubelet /usr/bin/kubelet
+    ln -s $CWD/kubernetes/platforms/linux/amd64/kubectl /usr/bin/kubectl
+
+    chmod +x /usr/bin/kubelet
+    chmod +x /usr/bin/kubectl
+}
+
 function init_flannel {
     echo "Waiting for etcd..."
     while true
@@ -509,6 +528,7 @@ function start_addons {
 }
 
 init_config
+init_binaries
 init_templates
 systemctl enable etcd2; systemctl start etcd2
 

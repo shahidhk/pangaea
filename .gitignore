@@ -1,5 +1,9 @@
+.tmp
+
 pangaea/pki/vagrant
+
 pangaea/vagrant/.vagrant
+pangaea/vagrant/.srl
 
 *.pyc
 
