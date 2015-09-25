@@ -1,0 +1,6 @@
+pangaea/pki/vagrant
+pangaea/vagrant/.vagrant
+
+*.pyc
+
+pan.*
