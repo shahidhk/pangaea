@@ -165,7 +165,6 @@ EOF
         mkdir -p $(dirname $TEMPLATE)
         cat << EOF > $TEMPLATE
 # https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/cluster-monitoring/influxdb ae81f0b55f8bc96753ddf268235e58b1889f9e25
-# TODO: grafana-service, influxdb-grafana-controller test
 ---
 apiVersion: v1
 kind: Service
@@ -303,6 +302,49 @@ spec:
 EOF
     }
 
+    local TEMPLATE=/srv/kubernetes/manifests/gcr-docker-credentials.yaml
+    [ -f $TEMPLATE ] || {
+        echo "TEMPLATE: $TEMPLATE"
+        mkdir -p $(dirname $TEMPLATE)
+        cat << EOF > $TEMPLATE
+apiVersion: v1
+kind: ReplicationController
+apiVersion: v1
+metadata:
+  name: gcr-docker-credentials-v1
+  namespace: kube-system
+  labels:
+    version: v1
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gcr-docker-credentials
+        version: v1
+    spec:
+      containers:
+        - image: hasura/google-jwt-gcr-token
+          name: gcr-docker-credentials
+          env:
+            - name: GOOGLE_SA_FILE
+              value: /token/auth-file/json
+            - name: DOCKER_GCR_REFRESH
+              value: '50'
+          volumeMounts:
+            - name: kubelet-docker-config
+              mountPath: /token/.dockercfg
+            - name: google-sa-auth
+              mountPath: /token/auth-file
+      volumes:
+        - name: kubelet-docker-config
+          hostPath:
+            path: /var/lib/kubelet/.dockercfg
+        - name: google-sa-auth
+          secret:
+            secretName: google-sa-auth
+EOF
+    }
 }
 
 function start_addons {
@@ -313,6 +355,11 @@ function start_addons {
     if [ $KUBE_MONITORING = true ]; then
         echo "K8S: monitoring addon"
         /opt/bin/kubectl create -f /srv/kubernetes/manifests/monitoring.yaml
+    fi
+    if [ $KUBE_GCR_CREDENTIALS = true ]; then
+        echo "K8S: docker gcr credentials"
+        touch "/var/lib/kubelet/.dockercfg" # create file if not present so we can mount it
+        /opt/bin/kubectl create -f /srv/kubernetes/manifests/gcr-docker-credentials.yaml
     fi
 }
 
