@@ -7,7 +7,7 @@ ROOT_DIR=$SCRIPT_DIR/../..
 
 source $ROOT_DIR/.pangaea
 
-CLOUD_CONFIG=$ROOT_DIR/pangaea/kubernetes/kubernetes-installer.sh
+CLOUD_CONFIG=$ROOT_DIR/pangaea/kubernetes/cloud-config.sh
 
 CREATED_JSON=$ROOT_DIR/.tmp/gce_instance_create.json
 
@@ -34,9 +34,16 @@ function init_ssl {
   mkdir -p "$SSL_TARBALL_PATH"
   "$SSL_INIT_SCRIPT_PATH" "$SSL_TARBALL_PATH" IP.1=10.3.0.1,IP.2=$NODE_IP
 
-  gcloud compute copy-files "$SSL_TARBALL_PATH/controller.tar" "$GCE_INSTANCE_NAME:/tmp/ssl.tar"
+  cp "$SSL_TARBALL_PATH/controller.tar" "$PKI_DIR/keys/_CURRENT.tar"
 }
 init_ssl
+function init_setup_archive {
+  local SETUP_ARCHIVE_PATH=$ROOT_DIR/.tmp/setup.tar
+  tar -cf "$SETUP_ARCHIVE_PATH" -C "$ROOT_DIR" .pangaea pangaea
+
+  gcloud compute copy-files "$SETUP_ARCHIVE_PATH" "$GCE_INSTANCE_NAME:/tmp/setup.tar"
+}
+init_setup_archive
 
 if [ "$ENVIRONMENT" = "development" ]; then
   gcloud compute firewall-rules create "$GCE_INSTANCE_NAME-kubeapiserver-8080" --allow tcp:8080 --description "$GCE_INSTANCE_NAME: kubernetes api server insecure port" --network "default"
@@ -46,7 +53,6 @@ echo
 echo "###############################################"
 echo
 echo "The Kubernetes compute instance is now booting."
-echo "If asked for an ssh password, wait for the instance to boot and try again."
 echo "gcloud compute ssh core@$GCE_INSTANCE_NAME"
 echo
 echo "###############################################"

@@ -2,7 +2,9 @@
 
 # OPTIONS
 # ENVIRONMENT={development, production}
-ENVIRONMENT=developmentfi
+ENVIRONMENT=production
+KUBE_LOGGING=true
+KUBE_MONITORING=true
 
 # GCE
 GCE_INSTANCE_NAME=testinstance
