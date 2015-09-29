@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# assigns PAN_WRAPPED=shadowed runnable with the same name
+# optional input WRAPPED_NAME=<name of executable to find>
+# source this in a bash script
+
+function get_pan_wrapped() {
+  local EXEC_NAME
+  if [ -n "$WRAPPED_NAME" ]; then
+    EXEC_NAME=$WRAPPED_NAME
+  else
+    EXEC_NAME=$(basename "$0")
+  fi
+
+  PAN_WRAPPED=$(type -aP $EXEC_NAME | head -n1)
+  if [ "$PAN_WRAPPED" = "$( cd "$(dirname $0)" ; pwd -P )/$(basename $0)" ]; then
+    PAN_WRAPPED=$(type -aP $EXEC_NAME | tail -n+2 | head -n1)
+  fi
+}
+get_pan_wrapped
+

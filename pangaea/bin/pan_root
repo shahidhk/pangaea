@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# assigns PAN_ROOT=closest parent directory with file .pangaea
+# source this in a bash script
+
+function get_pan_root() {
+  local CHECK=$(pwd)
+  while [ ! -e "$CHECK/.pangaea" ]; do
+    CHECK=${CHECK%/*}
+    if [ "$CHECK" = "" ]; then
+      echo "Error: .pangaea file not found in parent directories"
+      exit 1
+    fi
+  done
+
+  PAN_ROOT=$CHECK
+}
+get_pan_root
