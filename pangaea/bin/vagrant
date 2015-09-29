@@ -5,8 +5,8 @@ set -e
 SCRIPT_DIR=$(dirname "$0")
 
 source "$SCRIPT_DIR/pan_root" # set PAN_ROOT
+
 export VAGRANT_CWD="$PAN_ROOT/pangaea/vagrant"
 
 source "$SCRIPT_DIR/pan_wrapped" # set PAN_WRAPPED
 exec "$PAN_WRAPPED" "$@"
-

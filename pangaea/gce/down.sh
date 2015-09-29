@@ -9,6 +9,4 @@ source $ROOT_DIR/.pangaea
 
 gcloud compute instances delete "$GCE_INSTANCE_NAME" -q
 
-if [ "$ENVIRONMENT" = "development" ]; then
-  gcloud compute firewall-rules delete "$GCE_INSTANCE_NAME-kubeapiserver-8080" -q || true
-fi
+gcloud compute firewall-rules delete "$GCE_INSTANCE_NAME-kubeapiserver-443" -q || true

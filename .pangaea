@@ -3,6 +3,10 @@
 # OPTIONS
 # ENVIRONMENT={development, production}
 ENVIRONMENT=production
+# PROVIDER={gce, vagrant}
+PROVIDER=gce
+
+# KUBERNETES
 KUBE_LOGGING=true
 KUBE_MONITORING=true
 KUBE_GCR_CREDENTIALS=true

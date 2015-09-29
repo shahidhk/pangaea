@@ -1,0 +1,47 @@
+#!/bin/bash
+
+set -e
+
+if [ "$1" = "-h" ]; then
+  echo "$0 [-h] [cached]"
+  echo "use the cached option to use the cached list of downloaded instances from gce"
+  exit 0
+fi
+
+SCRIPT_DIR=$(dirname "$0")
+
+source "$SCRIPT_DIR/pan_root" # set PAN_ROOT
+source "$PAN_ROOT/.pangaea"   # options
+
+LIST_JSON=$PAN_ROOT/.tmp/gce_instance_list.json
+KUBE_NODE= # kubernetes apiserver
+KUBE_NAME= # name for kubectl setup
+
+function get_apiserver_ip() {
+  if [ $PROVIDER = gce ]; then
+    if [ ! "$1" = "cached" ] || [ ! -e "$LIST_JSON" ]; then
+      gcloud compute instances list --format json > "$LIST_JSON"
+    fi
+    KUBE_NODE=$(cat "$LIST_JSON" | jq -r '.[] | select(.name=="'"$GCE_INSTANCE_NAME"'").networkInterfaces[0].accessConfigs[0].natIP')
+    KUBE_NODE=https://$KUBE_NODE
+    KUBE_NAME=$GCE_INSTANCE_NAME
+  else
+    KUBE_NODE=http://127.0.0.1:8080
+    KUBE_NAME=vagrant
+  fi
+}
+get_apiserver_ip "$1"
+
+KUBE_PKI=$PAN_ROOT/pangaea/pki/keys/$KUBE_NAME
+
+kubectl config set-cluster $KUBE_NAME \
+  --server=$KUBE_NODE \
+  --certificate-authority="$KUBE_PKI/ca.pem"
+kubectl config set-credentials $KUBE_NAME \
+  --certificate-authority="$KUBE_PKI/ca.pem" \
+  --client-key="$KUBE_PKI/admin-key.pem" \
+  --client-certificate="$KUBE_PKI/admin.pem"
+kubectl config set-context $KUBE_NAME --cluster=$KUBE_NAME --user=$KUBE_NAME
+kubectl config use-context $KUBE_NAME
+
+echo "Configured kubectl to work with $KUBE_NAME"

@@ -27,9 +27,7 @@ function init_ssl {
 
   rm -rf $SSL_TARBALL_PATH
 
-  local NODE_IP=$(cat "$CREATED_JSON" | jq '.[0].networkInterfaces[0].accessConfigs[0].natIP')
-  NODE_IP=${NODE_IP#\"}
-  NODE_IP=${NODE_IP%\"}
+  local NODE_IP=$(cat "$CREATED_JSON" | jq -r '.[0].networkInterfaces[0].accessConfigs[0].natIP')
 
   mkdir -p "$SSL_TARBALL_PATH"
   "$SSL_INIT_SCRIPT_PATH" "$SSL_TARBALL_PATH" IP.1=10.3.0.1,IP.2=$NODE_IP
@@ -45,8 +43,12 @@ function init_setup_archive {
 }
 init_setup_archive
 
-if [ "$ENVIRONMENT" = "development" ]; then
-  gcloud compute firewall-rules create "$GCE_INSTANCE_NAME-kubeapiserver-8080" --allow tcp:8080 --description "$GCE_INSTANCE_NAME: kubernetes api server insecure port" --network "default"
+gcloud compute firewall-rules create "$GCE_INSTANCE_NAME-kubeapiserver-443" --allow tcp:443 --description "$GCE_INSTANCE_NAME: kubernetes api server secure port"
+
+if [ $PROVIDER = gce ]; then
+  "$ROOT_DIR/pangaea/bin/kubectl_setup"
+else
+  echo "Set PROVIDER=gce in .pangaea and run pangaea/bin/kubectl_setup to configure kubectl"
 fi
 
 echo
