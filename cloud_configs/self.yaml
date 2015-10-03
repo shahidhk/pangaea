@@ -16,6 +16,8 @@ coreos:
     public-ip: $private_ipv4
   flannel:
     interface: $private_ipv4
+  update:
+    reboot-strategy: off
   units:
   - name: etcd2.service
     command: start
