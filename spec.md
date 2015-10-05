@@ -104,3 +104,8 @@ pangaea
     roles, offline
     node environment
       bash based compiler
+
+# Configuring gcloud
+gcloud auth login
+gcloud config set project tfc-glassic
+gcloud config set compute/zone asia-east1-a
