@@ -49,6 +49,6 @@ init_setup_and_ssl
 SETUP_OPT_FILE=$PANGAEA_PATH/../.pangaea
 source "$SETUP_OPT_FILE"
 
-"$PANGAEA_PATH/kubernetes/kubernetes-installer.sh"
+source "$PANGAEA_PATH/kubernetes/kubernetes-installer.sh"
 
 source "$PANGAEA_PATH/kubernetes/kubernetes-services.sh"

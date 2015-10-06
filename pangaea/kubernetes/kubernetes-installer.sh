@@ -84,6 +84,11 @@ ExecStart=/opt/bin/kubelet \
   --register-node=true \
   --allow-privileged=true \
   --config=/etc/kubernetes/manifests \
+  $(if [ $PROVIDER = vagrant ]; then
+      cat << EOIF
+  --hostname-override=${ADVERTISE_IP}
+EOIF
+  fi) \
   --cluster_dns=${DNS_SERVICE_IP} \
   --cluster_domain=cluster.local \
   --cadvisor-port=0
@@ -200,7 +205,7 @@ spec:
     - --master=http://127.0.0.1:8080
     - --service-account-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem
     - --root-ca-file=/etc/kubernetes/ssl/ca.pem
-    - --cloud-provider=gce
+    - --cloud-provider=$PROVIDER
     livenessProbe:
       httpGet:
         host: 127.0.0.1
