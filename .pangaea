@@ -4,7 +4,7 @@
 # ENVIRONMENT={development, production}
 ENVIRONMENT=production
 # PROVIDER={gce, vagrant}
-PROVIDER=gce
+PROVIDER=vagrant
 
 # KUBERNETES
 KUBE_LOGGING=true

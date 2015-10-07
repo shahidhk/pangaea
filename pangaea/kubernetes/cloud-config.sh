@@ -7,15 +7,22 @@ export PANGAEA_PATH=/tmp/setup/pangaea
 function init_binaries {
     [ ! -x /opt/bin/kubectl ] || return 0
 
-    local CWD=/pangaea/.tmp
+    # in development, /pangaea is the project root, and we use /pangaea/.tmp for caching
+    local CWD=/pangaea/.tmp/.kubernetes
     local K8S_VER=v1.0.6
+    local K8S_BINARY_HASH=a9e46f18ffd67602619cd2f88472c71a
 
-    if [ ! -e $CWD/kubernetes/server/kubernetes/server/bin/kubelet ]; then
+    if [ ! -e $CWD/kubernetes.tar.gz ] || ! md5sum -c <(echo "$K8S_BINARY_HASH $CWD/kubernetes.tar.gz"); then
+        echo "PAN: downloading Kubernetes binaries"
         mkdir -p $CWD
         curl -L -o $CWD/kubernetes.tar.gz https://github.com/kubernetes/kubernetes/releases/download/$K8S_VER/kubernetes.tar.gz
+    else
+        echo "PAN: using cached Kubernetes binaries"
+    fi
 
-        tar -xzf $CWD/kubernetes.tar.gz -C $CWD/
-        tar -xzf $CWD/kubernetes/server/kubernetes-server-linux-amd64.tar.gz -C $CWD/kubernetes/server/
+    if [ ! -e $CWD/kubernetes/server/kubernetes/server/bin/kubelet ]; then
+        tar -xzvf $CWD/kubernetes.tar.gz -C $CWD/
+        tar -xzvf $CWD/kubernetes/server/kubernetes-server-linux-amd64.tar.gz -C $CWD/kubernetes/server/
     fi
 
     mkdir -p /opt/bin

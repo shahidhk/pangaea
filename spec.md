@@ -21,6 +21,9 @@
 
 # Tasks
 
+- specify loadBalancerIP (on release v1.1.0)
+- test bug where external loadbalancer open connection prevents kube-proxy setup
+
 - package as pip
 - gce mount disk
 - documentation
@@ -109,3 +112,12 @@ pangaea
 gcloud auth login
 gcloud config set project tfc-glassic
 gcloud config set compute/zone asia-east1-a
+
+# Next tasks
+x curl multiple document kubernetes object
+x vagrant cache kubernetes binaries
+test nfs permissions issues
+vagrant cache docker
+test coreos reboots
+mount gce disks
+services kubectl can fail in race, on logging with fluentd
