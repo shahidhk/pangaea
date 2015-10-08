@@ -16,6 +16,11 @@ vagrant suspend   # pause Kubernetes node
 providers/gce/up.sh     # bring up Kubernetes node
 providers/gce/down.sh   # bring down node
 ```
+## Requirements
+- vagrant, virtualbox
+- gcloud
+- ag
+- kubectl
 
 ## TODO
 

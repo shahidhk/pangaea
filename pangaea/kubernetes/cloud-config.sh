@@ -5,14 +5,10 @@ set -e
 # setup files like installation scripts and pki keys
 PANGAEA_PATH=/tmp/setup/pangaea
 
-# in development, we mount the project root at /pangaea, and we use /pangaea/.tmp for caching
-PANGAEA_CACHE=/pangaea/.tmp
-
 function init_kube_binaries {
     [ ! -x /opt/bin/kubectl ] || return 0
 
-    # in development, /pangaea is the project root, and we use /pangaea/.tmp for caching
-    local CWD=$PANGAEA_CACHE/.kubernetes
+    local CWD=/tmp
     local K8S_VER=v1.0.6
     local K8S_BINARY_HASH=a9e46f18ffd67602619cd2f88472c71a
 
@@ -25,8 +21,8 @@ function init_kube_binaries {
     fi
 
     if [ ! -e $CWD/kubernetes/server/kubernetes/server/bin/kubelet ]; then
-        tar -xzvf $CWD/kubernetes.tar.gz -C $CWD/
-        tar -xzvf $CWD/kubernetes/server/kubernetes-server-linux-amd64.tar.gz -C $CWD/kubernetes/server/
+        tar -xzf $CWD/kubernetes.tar.gz -C $CWD/
+        tar -xzf $CWD/kubernetes/server/kubernetes-server-linux-amd64.tar.gz -C $CWD/kubernetes/server/
     fi
 
     mkdir -p /opt/bin
