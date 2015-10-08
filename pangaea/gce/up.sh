@@ -36,6 +36,7 @@ function init_ssl {
   cp "$SSL_TARBALL_PATH/controller.tar" "$PKI_DIR/keys/_CURRENT.tar"
 }
 init_ssl
+
 function init_setup_archive {
   local SETUP_ARCHIVE_PATH=$ROOT_DIR/.tmp/setup.tar
   tar -cf "$SETUP_ARCHIVE_PATH" -C "$ROOT_DIR" .pangaea pangaea

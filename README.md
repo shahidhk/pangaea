@@ -20,7 +20,7 @@ providers/gce/down.sh   # bring down node
 - vagrant, virtualbox  
     vagrant plugin install vagrant-vbox-snapshot
 - gcloud
-- ag
+- jq
 - kubectl
 
 ## TODO
