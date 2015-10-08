@@ -2,13 +2,17 @@
 
 set -e
 
-export PANGAEA_PATH=/tmp/setup/pangaea
+# setup files like installation scripts and pki keys
+PANGAEA_PATH=/tmp/setup/pangaea
 
-function init_binaries {
+# in development, we mount the project root at /pangaea, and we use /pangaea/.tmp for caching
+PANGAEA_CACHE=/pangaea/.tmp
+
+function init_kube_binaries {
     [ ! -x /opt/bin/kubectl ] || return 0
 
     # in development, /pangaea is the project root, and we use /pangaea/.tmp for caching
-    local CWD=/pangaea/.tmp/.kubernetes
+    local CWD=$PANGAEA_CACHE/.kubernetes
     local K8S_VER=v1.0.6
     local K8S_BINARY_HASH=a9e46f18ffd67602619cd2f88472c71a
 
@@ -38,6 +42,7 @@ function init_binaries {
     chmod +x /opt/bin/kubectl
 }
 
+# creates PANGAEA_PATH
 function init_setup_and_ssl {
     while [ ! -e /tmp/setup.tar ]
     do
@@ -50,7 +55,7 @@ function init_setup_and_ssl {
     tar -C /etc/kubernetes/ssl -xf /tmp/setup/pangaea/pki/keys/_CURRENT.tar
 }
 
-init_binaries
+init_kube_binaries
 init_setup_and_ssl
 
 SETUP_OPT_FILE=$PANGAEA_PATH/../.pangaea
