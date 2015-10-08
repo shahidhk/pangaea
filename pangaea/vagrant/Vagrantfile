@@ -8,28 +8,28 @@ require 'fileutils'
 
 Vagrant.require_version ">= 1.6.0"
 
-def rel_path(p)
-  File.join File.dirname(__FILE__), p
+def abs_path(p)
+  File.join File.dirname(__FILE__), '../..', p
 end
 
 NODE_IP = '172.17.6.101' # single node set up
-USER_DATA_PATH = rel_path '../kubernetes/cloud-config.sh'
+USER_DATA_PATH = abs_path 'pangaea/kubernetes/cloud-config.sh'
 
-CONFIG = rel_path 'config.rb'
-ROOT_PATH = rel_path '../..'
+CONFIG = abs_path 'pangaea/vagrant/config.rb'
+ROOT_PATH = abs_path '.'
 
-SSL_TARBALL_PATH = rel_path '../pki/keys/vagrant'
-SSL_INIT_SCRIPT_PATH = rel_path '../pki/init-ssl'
+SSL_TARBALL_PATH = abs_path 'pangaea/pki/keys/vagrant'
+SSL_INIT_SCRIPT_PATH = abs_path 'pangaea/pki/init-ssl'
 if !File.exist?(SSL_TARBALL_PATH) then
     system(%Q(\
         mkdir -p "#{SSL_TARBALL_PATH}" && \
         "#{SSL_INIT_SCRIPT_PATH}" "#{SSL_TARBALL_PATH}" IP.1=10.3.0.1,IP.2=#{NODE_IP} && \
-        cp "#{SSL_TARBALL_PATH}/controller.tar" "#{rel_path '../pki/keys/_CURRENT.tar'}"\
+        cp "#{SSL_TARBALL_PATH}/controller.tar" "#{abs_path 'pangaea/pki/keys/_CURRENT.tar'}"\
     )) or abort "failed generating SSL artifacts"
 end
 
-SETUP_ARCHIVE_PATH = rel_path '../../.tmp/setup.tar'
-system(%Q(tar -cf "#{SETUP_ARCHIVE_PATH}" -C "#{rel_path '../..'}" .pangaea pangaea)) or abort "failed generating setup archive"
+SETUP_ARCHIVE_PATH = abs_path '.tmp/setup.tar'
+system(%Q(tar -cf "#{SETUP_ARCHIVE_PATH}" -C "#{abs_path '.'}" .pangaea pangaea)) or abort "failed generating setup archive"
 
 # Defaults for config options defined in CONFIG
 $num_instances = 1

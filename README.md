@@ -17,7 +17,8 @@ providers/gce/up.sh     # bring up Kubernetes node
 providers/gce/down.sh   # bring down node
 ```
 ## Requirements
-- vagrant, virtualbox
+- vagrant, virtualbox  
+    vagrant plugin install vagrant-vbox-snapshot
 - gcloud
 - ag
 - kubectl
