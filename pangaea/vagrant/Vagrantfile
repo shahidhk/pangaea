@@ -12,24 +12,9 @@ def abs_path(p)
   File.join File.dirname(__FILE__), '../..', p
 end
 
-NODE_IP = '172.17.6.101' # single node set up
 USER_DATA_PATH = abs_path 'pangaea/kubernetes/cloud-config.sh'
 
 CONFIG = abs_path 'pangaea/vagrant/config.rb'
-ROOT_PATH = abs_path '.'
-
-SSL_TARBALL_PATH = abs_path 'pangaea/pki/keys/vagrant'
-SSL_INIT_SCRIPT_PATH = abs_path 'pangaea/pki/init-ssl'
-if !File.exist?(SSL_TARBALL_PATH) then
-    system(%Q(\
-        mkdir -p "#{SSL_TARBALL_PATH}" && \
-        "#{SSL_INIT_SCRIPT_PATH}" "#{SSL_TARBALL_PATH}" IP.1=10.3.0.1,IP.2=#{NODE_IP} && \
-        cp "#{SSL_TARBALL_PATH}/controller.tar" "#{abs_path 'pangaea/pki/keys/_CURRENT.tar'}"\
-    )) or abort "failed generating SSL artifacts"
-end
-
-SETUP_ARCHIVE_PATH = abs_path '.tmp/setup.tar'
-system(%Q(tar -cf "#{SETUP_ARCHIVE_PATH}" -C "#{abs_path '.'}" .pangaea pangaea)) or abort "failed generating setup archive"
 
 # Defaults for config options defined in CONFIG
 $num_instances = 1
@@ -125,7 +110,7 @@ Vagrant.configure("2") do |config|
       ip = "172.17.6.#{i+100}"
       config.vm.network :private_network, ip: ip
 
-      $shared_folders[ROOT_PATH] = '/pangaea'
+      $shared_folders[abs_path '.'] = '/pangaea'
 
       # nfs over udp causes writes to hang on coreos guest and ubuntu host
       nfs_options = {
@@ -143,6 +128,14 @@ Vagrant.configure("2") do |config|
       end
 
       # provision coreos machine
+
+      SETUP_ARCHIVE_PATH = abs_path '.tmp/setup.tar' # written to by init script
+      config.vm.provision "trigger", :option => "value" do |trigger|
+        trigger.fire do
+          run "%s vagrant #{ip}" % (abs_path 'pangaea/setup/init_ssl_and_setup_archive.sh')
+        end
+      end
+
       config.vm.provision :file, :source => SETUP_ARCHIVE_PATH, :destination => "/tmp/setup.tar"
 
       config.vm.provision :file, :source => USER_DATA_PATH, :destination => "/tmp/vagrantfile-user-data"

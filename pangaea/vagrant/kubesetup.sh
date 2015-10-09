@@ -5,11 +5,10 @@ ROOT_DIR=$SCRIPT_DIR/../..
 
 # ENSURE CORRECT PROVIDER
 
-SETUP_OPT_FILE=$ROOT_DIR/.pangaea
-source $SETUP_OPT_FILE
+source "$ROOT_DIR/.pangaea"
 
 if [ ! $PROVIDER = vagrant ]; then
-    echo "PAN: Set PROVIDER to vagrant in your .pangaea file. Aborting kubesetup."
+    echo "PAN: Set PROVIDER=vagrant .pangaea. Aborting kubesetup"
     exit 1
 fi
 
@@ -17,7 +16,7 @@ VAGRANT=$ROOT_DIR/pangaea/bin/vagrant
 
 # CONFIRM USER ACTION
 
-if ! "$VAGRANT" status | grep "not created"; then
+if ! "$VAGRANT" status | grep "not created" &>/dev/null; then
     echo "WARNING: This will restore your VM to a bare Kubernetes setup"
     echo "         You will lose all unsaved/unsnapshotted changes!"
 
