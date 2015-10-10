@@ -116,9 +116,9 @@ gcloud config set compute/zone asia-east1-a
 # Next tasks
 x curl multiple document kubernetes object
 x vagrant cache kubernetes binaries
+x race condition in wait for setup.tar where only part of file is present
 vagrant cache docker
 test coreos reboots
-race condition in wait for setup.tar where only part of file is present
 test nfs permissions issues
 mount gce disks
 services kubectl can fail in race, on logging with fluentd

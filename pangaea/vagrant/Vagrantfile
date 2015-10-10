@@ -129,14 +129,16 @@ Vagrant.configure("2") do |config|
 
       # provision coreos machine
 
-      SETUP_ARCHIVE_PATH = abs_path '.tmp/setup.tar' # written to by init script
+      SETUP_TAR = abs_path '.tmp/setup.tar' # written to by init script
+      SETUP_MD5 = abs_path '.tmp/setup.md5'
       config.vm.provision "trigger", :option => "value" do |trigger|
         trigger.fire do
           run "%s vagrant #{ip}" % (abs_path 'pangaea/setup/init_ssl_and_setup_archive.sh')
         end
       end
 
-      config.vm.provision :file, :source => SETUP_ARCHIVE_PATH, :destination => "/tmp/setup.tar"
+      config.vm.provision :file, :source => SETUP_TAR, :destination => "/tmp/setup.tar"
+      config.vm.provision :file, :source => SETUP_MD5, :destination => "/tmp/setup.md5"
 
       config.vm.provision :file, :source => USER_DATA_PATH, :destination => "/tmp/vagrantfile-user-data"
       config.vm.provision :shell, :inline => "mv /tmp/vagrantfile-user-data /var/lib/coreos-vagrant/", :privileged => true

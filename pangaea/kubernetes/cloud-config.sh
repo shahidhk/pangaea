@@ -16,7 +16,7 @@ function init_kube_binaries {
     local K8S_VER=v1.0.6
     local K8S_BINARY_HASH=a9e46f18ffd67602619cd2f88472c71a
 
-    if [ ! -e $CWD/kubernetes.tar.gz ] || ! md5sum -c <(echo "$K8S_BINARY_HASH $CWD/kubernetes.tar.gz"); then
+    if ! md5sum -c <(echo "$K8S_BINARY_HASH  $CWD/kubernetes.tar.gz"); then
         echo "PAN: downloading Kubernetes binaries"
         curl -L -o $CWD/kubernetes.tar.gz https://github.com/kubernetes/kubernetes/releases/download/$K8S_VER/kubernetes.tar.gz
     else
@@ -43,18 +43,21 @@ function init_kube_binaries {
 
 # creates PANGAEA_PATH
 function init_setup_and_ssl {
-    # tar uploaded from workstation with pki keys
+    # setup tar uploaded from workstation with pki keys and installation files
     local SETUP_TAR=/tmp/setup.tar
+    local SETUP_MD5=/tmp/setup.md5
 
-    while [ ! -e $SETUP_TAR ]
-    do
-      sleep 2
-    done
-    mkdir -p $TMP_PATH/setup
-    tar -C $TMP_PATH/setup -xf $SETUP_TAR
+    if [ ! -e $TMP_PATH/setup ]
+        while ! md5sum -c <(echo "$(cat $SETUP_MD5)  $SETUP_TAR"); do
+          sleep 2
+        done
 
-    mkdir -p /etc/kubernetes/ssl
-    tar -C /etc/kubernetes/ssl -xf $TMP_PATH/setup/pangaea/pki/keys/_CURRENT.tar
+        mkdir -p $TMP_PATH/setup
+        tar -C $TMP_PATH/setup -xf $SETUP_TAR
+
+        mkdir -p /etc/kubernetes/ssl
+        tar -C /etc/kubernetes/ssl -xf $TMP_PATH/setup/pangaea/pki/keys/_CURRENT.tar
+    fi
 }
 
 init_kube_binaries

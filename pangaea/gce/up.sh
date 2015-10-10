@@ -33,10 +33,12 @@ gcloud compute instances create "$GCE_INSTANCE_NAME" \
 function init_ssl_and_setup_archive {
     local NODE_IP=$(cat "$CREATED_JSON" | jq -r '.[0].networkInterfaces[0].accessConfigs[0].natIP')
 
-    local SETUP_ARCHIVE_PATH=$ROOT_DIR/.tmp/setup.tar # written to by init script
+    local SETUP_TAR=$ROOT_DIR/.tmp/setup.tar # written to by init script
+    local SETUP_MD5=$ROOT_DIR/.tmp/setup.md5
     "$ROOT_DIR/pangaea/setup/init_ssl_and_setup_archive.sh" $GCE_INSTANCE_NAME $NODE_IP
 
-    gcloud compute copy-files "$SETUP_ARCHIVE_PATH" "$GCE_INSTANCE_NAME:/tmp/setup.tar"
+    gcloud compute copy-files "$SETUP_TAR" "$GCE_INSTANCE_NAME:/tmp/setup.tar"
+    gcloud compute copy-files "$SETUP_MD5" "$GCE_INSTANCE_NAME:/tmp/setup.md5"
 }
 init_ssl_and_setup_archive
 

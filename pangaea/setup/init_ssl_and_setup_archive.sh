@@ -23,8 +23,11 @@ function init_ssl {
 }
 
 function init_setup_archive {
-    local SETUP_ARCHIVE_PATH=$ROOT_DIR/.tmp/setup.tar
-    tar -cf "$SETUP_ARCHIVE_PATH" -C "$ROOT_DIR" .pangaea pangaea
+    local SETUP_TAR=$ROOT_DIR/.tmp/setup.tar
+    local SETUP_MD5=$ROOT_DIR/.tmp/setup.md5
+
+    tar -cf "$SETUP_TAR" -C "$ROOT_DIR" .pangaea pangaea
+    md5sum "$SETUP_TAR" | cut -f 1 -d " " > "$SETUP_MD5"
 }
 
 init_ssl
