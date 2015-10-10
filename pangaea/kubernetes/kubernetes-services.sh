@@ -4,15 +4,17 @@ set -e
 
 function init_templates {
 
-    local TEMPLATE=/srv/kubernetes/manifests/logging.yaml
+    # LOGGING
+
+    # https://github.com/kubernetes/kubernetes ae81f0b55f8bc96753ddf268235e58b1889f9e25
+    # [{es, kibana}-{controller, service}] https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch
+    # [elasticsearch-fluentd] https://github.com/kubernetes/kubernetes/blob/master/cluster/saltbase/salt/fluentd-es/fluentd-es.yaml
+
+    local TEMPLATE=/srv/kubernetes/manifests/logging-elasticsearch-logging-rc.yaml
     [ -f $TEMPLATE ] || {
         echo "TEMPLATE: $TEMPLATE"
         mkdir -p $(dirname $TEMPLATE)
         cat << EOF > $TEMPLATE
-# https://github.com/kubernetes/kubernetes ae81f0b55f8bc96753ddf268235e58b1889f9e25
-# [{es, kibana}-{controller, service}] https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch
-# [elasticsearch-fluentd] https://github.com/kubernetes/kubernetes/blob/master/cluster/saltbase/salt/fluentd-es/fluentd-es.yaml
----
 apiVersion: v1
 kind: ReplicationController
 metadata:
@@ -53,7 +55,13 @@ spec:
       volumes:
       - name: es-persistent-storage
         emptyDir: {}
----
+EOF
+    }
+    local TEMPLATE=/srv/kubernetes/manifests/logging-elasticsearch-logging-svc.yaml
+    [ -f $TEMPLATE ] || {
+        echo "TEMPLATE: $TEMPLATE"
+        mkdir -p $(dirname $TEMPLATE)
+        cat << EOF > $TEMPLATE
 apiVersion: v1
 kind: Service
 metadata:
@@ -70,7 +78,13 @@ spec:
     targetPort: db
   selector:
     k8s-app: elasticsearch-logging
----
+EOF
+    }
+    local TEMPLATE=/srv/kubernetes/manifests/logging-fluentd-elasticsearch-pod.yaml
+    [ -f $TEMPLATE ] || {
+        echo "TEMPLATE: $TEMPLATE"
+        mkdir -p $(dirname $TEMPLATE)
+        cat << EOF > $TEMPLATE
 apiVersion: v1
 kind: Pod
 metadata:
@@ -103,7 +117,13 @@ spec:
   - name: containers
     hostPath:
       path: /var/lib/docker/containers
----
+EOF
+    }
+    local TEMPLATE=/srv/kubernetes/manifests/logging-kibana-logging-rc.yaml
+    [ -f $TEMPLATE ] || {
+        echo "TEMPLATE: $TEMPLATE"
+        mkdir -p $(dirname $TEMPLATE)
+        cat << EOF > $TEMPLATE
 apiVersion: v1
 kind: ReplicationController
 metadata:
@@ -138,7 +158,13 @@ spec:
         - containerPort: 5601
           name: ui
           protocol: TCP
----
+EOF
+    }
+    local TEMPLATE=/srv/kubernetes/manifests/logging-kibana-logging-svc.yaml
+    [ -f $TEMPLATE ] || {
+        echo "TEMPLATE: $TEMPLATE"
+        mkdir -p $(dirname $TEMPLATE)
+        cat << EOF > $TEMPLATE
 apiVersion: v1
 kind: Service
 metadata:
@@ -159,13 +185,15 @@ spec:
 EOF
     }
 
-    local TEMPLATE=/srv/kubernetes/manifests/monitoring.yaml
+    # MONITORING
+
+    # https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/cluster-monitoring/influxdb ae81f0b55f8bc96753ddf268235e58b1889f9e25
+
+    local TEMPLATE=/srv/kubernetes/manifests/monitoring-monitoring-grafana-svc.yaml
     [ -f $TEMPLATE ] || {
         echo "TEMPLATE: $TEMPLATE"
         mkdir -p $(dirname $TEMPLATE)
         cat << EOF > $TEMPLATE
-# https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/cluster-monitoring/influxdb ae81f0b55f8bc96753ddf268235e58b1889f9e25
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -181,7 +209,13 @@ spec:
       targetPort: 8080
   selector:
     k8s-app: influxGrafana
----
+EOF
+    }
+    local TEMPLATE=/srv/kubernetes/manifests/monitoring-monitoring-heapster-rc.yaml
+    [ -f $TEMPLATE ] || {
+        echo "TEMPLATE: $TEMPLATE"
+        mkdir -p $(dirname $TEMPLATE)
+        cat << EOF > $TEMPLATE
 apiVersion: v1
 kind: ReplicationController
 metadata:
@@ -214,7 +248,13 @@ spec:
             - /heapster
             - --source=kubernetes:''
             - --sink=influxdb:http://monitoring-influxdb:8086
----
+EOF
+    }
+    local TEMPLATE=/srv/kubernetes/manifests/monitoring-monitoring-heapster-svc.yaml
+    [ -f $TEMPLATE ] || {
+        echo "TEMPLATE: $TEMPLATE"
+        mkdir -p $(dirname $TEMPLATE)
+        cat << EOF > $TEMPLATE
 kind: Service
 apiVersion: v1
 metadata:
@@ -229,7 +269,13 @@ spec:
       targetPort: 8082
   selector:
     k8s-app: heapster
----
+EOF
+    }
+    local TEMPLATE=/srv/kubernetes/manifests/monitoring-influxdb-grafana-rc.yaml
+    [ -f $TEMPLATE ] || {
+        echo "TEMPLATE: $TEMPLATE"
+        mkdir -p $(dirname $TEMPLATE)
+        cat << EOF > $TEMPLATE
 apiVersion: v1
 kind: ReplicationController
 metadata:
@@ -280,7 +326,13 @@ spec:
       volumes:
       - name: influxdb-persistent-storage
         emptyDir: {}
----
+EOF
+    }
+    local TEMPLATE=/srv/kubernetes/manifests/monitoring-monitoring-influxdb-svc.yaml
+    [ -f $TEMPLATE ] || {
+        echo "TEMPLATE: $TEMPLATE"
+        mkdir -p $(dirname $TEMPLATE)
+        cat << EOF > $TEMPLATE
 apiVersion: v1
 kind: Service
 metadata:
@@ -350,16 +402,24 @@ EOF
 function start_addons {
     if [ $KUBE_LOGGING = true ]; then
         echo "K8S: logging addon"
-        /opt/bin/kubectl create -f /srv/kubernetes/manifests/logging.yaml
+        curl --silent -XPOST -d"$(cat /srv/kubernetes/manifests/logging-elasticsearch-logging-rc.yaml)" "http://127.0.0.1:8080/api/v1/namespaces/kube-system/replicationcontrollers" > /dev/null
+        curl --silent -XPOST -d"$(cat /srv/kubernetes/manifests/logging-elasticsearch-logging-svc.yaml)" "http://127.0.0.1:8080/api/v1/namespaces/kube-system/services" > /dev/null
+        curl --silent -XPOST -d"$(cat /srv/kubernetes/manifests/logging-fluentd-elasticsearch-pod.yaml)" "http://127.0.0.1:8080/api/v1/namespaces/kube-system/pods" > /dev/null
+        curl --silent -XPOST -d"$(cat /srv/kubernetes/manifests/logging-kibana-logging-rc.yaml)" "http://127.0.0.1:8080/api/v1/namespaces/kube-system/replicationcontrollers" > /dev/null
+        curl --silent -XPOST -d"$(cat /srv/kubernetes/manifests/logging-kibana-logging-svc.yaml)" "http://127.0.0.1:8080/api/v1/namespaces/kube-system/services" > /dev/null
     fi
     if [ $KUBE_MONITORING = true ]; then
         echo "K8S: monitoring addon"
-        /opt/bin/kubectl create -f /srv/kubernetes/manifests/monitoring.yaml
+        curl --silent -XPOST -d"$(cat /srv/kubernetes/manifests/monitoring-monitoring-grafana-svc.yaml)" "http://127.0.0.1:8080/api/v1/namespaces/kube-system/services" > /dev/null
+        curl --silent -XPOST -d"$(cat /srv/kubernetes/manifests/monitoring-monitoring-heapster-rc.yaml)" "http://127.0.0.1:8080/api/v1/namespaces/kube-system/replicationcontrollers" > /dev/null
+        curl --silent -XPOST -d"$(cat /srv/kubernetes/manifests/monitoring-monitoring-heapster-svc.yaml)" "http://127.0.0.1:8080/api/v1/namespaces/kube-system/services" > /dev/null
+        curl --silent -XPOST -d"$(cat /srv/kubernetes/manifests/monitoring-influxdb-grafana-rc.yaml)" "http://127.0.0.1:8080/api/v1/namespaces/kube-system/replicationcontrollers" > /dev/null
+        curl --silent -XPOST -d"$(cat /srv/kubernetes/manifests/monitoring-monitoring-influxdb-svc.yaml)" "http://127.0.0.1:8080/api/v1/namespaces/kube-system/services" > /dev/null
     fi
     if [ $KUBE_GCR_CREDENTIALS = true ]; then
         echo "K8S: docker gcr credentials"
         touch "/var/lib/kubelet/.dockercfg" # create file if not present so we can mount it
-        /opt/bin/kubectl create -f /srv/kubernetes/manifests/gcr-docker-credentials.yaml
+        curl --silent -XPOST -d"$(cat /srv/kubernetes/manifests/gcr-docker-credentials.yaml)" "http://127.0.0.1:8080/api/v1/namespaces/kube-system/replicationcontrollers" > /dev/null
     fi
 }
 
