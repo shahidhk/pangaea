@@ -47,7 +47,7 @@ function init_setup_and_ssl {
     local SETUP_TAR=/tmp/setup.tar
     local SETUP_MD5=/tmp/setup.md5
 
-    if [ ! -e $TMP_PATH/setup ]
+    if [ ! -e $TMP_PATH/setup ]; then
         while ! md5sum -c <(echo "$(cat $SETUP_MD5)  $SETUP_TAR"); do
           sleep 2
         done

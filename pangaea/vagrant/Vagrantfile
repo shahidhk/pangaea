@@ -12,9 +12,17 @@ def abs_path(p)
   File.join File.dirname(__FILE__), '../..', p
 end
 
+# ENSURE CORRECT PROVIDER
+system %Q(bash -c 'source "#{abs_path '.pangaea'}"; [ $PROVIDER = vagrant ]') or abort "PAN: Set PROVIDER=vagrant in .pangaea"
+
 USER_DATA_PATH = abs_path 'pangaea/kubernetes/cloud-config.sh'
 
 CONFIG = abs_path 'pangaea/vagrant/config.rb'
+
+SETUP_TAR = abs_path '.tmp/setup.tar' # written to by init script
+SETUP_MD5 = abs_path '.tmp/setup.md5'
+# vagrant checks for these files right at the start, we will generate these in the trigger provisioner
+system %Q(touch "#{SETUP_TAR}" "#{SETUP_MD5}")
 
 # Defaults for config options defined in CONFIG
 $num_instances = 1
@@ -129,8 +137,6 @@ Vagrant.configure("2") do |config|
 
       # provision coreos machine
 
-      SETUP_TAR = abs_path '.tmp/setup.tar' # written to by init script
-      SETUP_MD5 = abs_path '.tmp/setup.md5'
       config.vm.provision "trigger", :option => "value" do |trigger|
         trigger.fire do
           run "%s vagrant #{ip}" % (abs_path 'pangaea/setup/init_ssl_and_setup_archive.sh')

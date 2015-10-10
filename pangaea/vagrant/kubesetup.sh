@@ -8,7 +8,7 @@ ROOT_DIR=$SCRIPT_DIR/../..
 source "$ROOT_DIR/.pangaea"
 
 if [ ! $PROVIDER = vagrant ]; then
-    echo "PAN: Set PROVIDER=vagrant in .pangaea. Aborting kubesetup"
+    echo "PAN: Set PROVIDER=vagrant in .pangaea. Aborting kubesetup."
     exit 1
 fi
 
