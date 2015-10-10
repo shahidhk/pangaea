@@ -26,7 +26,7 @@ function init_setup_archive {
     local SETUP_TAR=$ROOT_DIR/.tmp/setup.tar
     local SETUP_MD5=$ROOT_DIR/.tmp/setup.md5
 
-    tar -cf "$SETUP_TAR" -C "$ROOT_DIR" .pangaea pangaea
+    tar -zcf "$SETUP_TAR" -C "$ROOT_DIR" .pangaea pangaea
     md5sum "$SETUP_TAR" | cut -f 1 -d " " > "$SETUP_MD5"
 }
 

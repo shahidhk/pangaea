@@ -53,7 +53,7 @@ function init_setup_and_ssl {
         done
 
         mkdir -p $TMP_PATH/setup
-        tar -C $TMP_PATH/setup -xf $SETUP_TAR
+        tar -C $TMP_PATH/setup -xzf $SETUP_TAR
 
         mkdir -p /etc/kubernetes/ssl
         tar -C /etc/kubernetes/ssl -xf $TMP_PATH/setup/pangaea/pki/keys/_CURRENT.tar
