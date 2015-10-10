@@ -49,9 +49,28 @@ else
     # WAIT FOR IMAGE DOWNLOADS
 
     echo "PAN: Provisioned machine, waiting for Kubernetes setup..."
-    KUBE_CORE=(kube-apiserver kube-controller-manager kube-proxy kube-scheduler kube-dns)
-    assure_downloaded "${KUBE_CORE[@]}"
+    KUBE_CORE_IMGS=(kube-apiserver kube-controller-manager kube-proxy kube-scheduler kube-dns)
+    assure_downloaded "${KUBE_CORE_IMGS[@]}"
     echo "PAN: We have Kubernetes core"
+
+    if [ $KUBE_LOGGING = true ]; then
+        IMGS=(elasticsearch-logging fluentd-elasticsearch kibana-logging)
+        assure_downloaded "${IMGS[@]}"
+        echo "PAN: KUBE_LOGGING loaded"
+    fi
+
+    if [ $KUBE_MONITORING = true ]; then
+        IMGS=(monitoring-heapster monitoring-influxdb-grafana)
+        assure_downloaded "${IMGS[@]}"
+        echo "PAN: KUBE_MONITORING loaded"
+    fi
+
+    if [ $KUBE_GCE_CREDENTIALS = true ]; then
+        # For state Running we need to provide credentials
+        # It is discouraged for the snapshot to include credentials
+        # Further, to pull images subsequently we need the internet anyway
+        :
+    fi
 
     echo "PAN: Creating a snapshot"
     "$VAGRANT" snapshot take KubeSetup
