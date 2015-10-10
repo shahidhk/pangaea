@@ -8,7 +8,7 @@ ROOT_DIR=$SCRIPT_DIR/../..
 source "$ROOT_DIR/.pangaea"
 
 if [ ! $PROVIDER = vagrant ]; then
-    echo "PAN: Set PROVIDER=vagrant .pangaea. Aborting kubesetup"
+    echo "PAN: Set PROVIDER=vagrant in .pangaea. Aborting kubesetup"
     exit 1
 fi
 
@@ -30,23 +30,30 @@ fi
 
 # KUBE SETUP
 
+function assure_downloaded {
+    for i in "$@"; do
+        while ! "$VAGRANT" ssh -c 'kubectl get po --namespace=kube-system 2>/dev/null' 2>/dev/null | grep "$i" | grep 'Running' &>/dev/null; do
+            sleep 5
+        done
+    done
+}
+
 if "$VAGRANT" snapshot list | grep KubeSetup &>/dev/null; then
     "$VAGRANT" snapshot go KubeSetup -r
 else
     echo "PAN: Setting up bare Kubernetes VM. This could take a while..."
     "$VAGRANT" destroy -f
     "$VAGRANT" up
-    # "$ROOT_DIR/pangaea/bin/kubectl_setup"
+    "$ROOT_DIR/pangaea/bin/kubectl_setup"
+
+    # WAIT FOR IMAGE DOWNLOADS
 
     echo "PAN: Provisioned machine, waiting for Kubernetes setup..."
-    KUBE_CORE=(kube-apiserver kube-controller-manager kube-dns kube-proxy kube-scheduler)
-    for el in "${KUBE_CORE[@]}"; do
-        while ! "$VAGRANT" ssh -c 'kubectl get po --namespace=kube-system' | grep "$el" &>/dev/null; do
-            sleep 5
-        done
-    done
+    KUBE_CORE=(kube-apiserver kube-controller-manager kube-proxy kube-scheduler kube-dns)
+    assure_downloaded "${KUBE_CORE[@]}"
+    echo "PAN: We have Kubernetes core"
 
-    echo "PAN: We have Kubernetes core. Creating a snapshot."
+    echo "PAN: Creating a snapshot"
     "$VAGRANT" snapshot take KubeSetup
 fi
 
