@@ -22,6 +22,7 @@
 # Tasks
 
 - specify loadBalancerIP (on release v1.1.0)
+- specify gcePersistentDisk for pod mounts (on v1.1.0)
 - test bug where external loadbalancer open connection prevents kube-proxy setup
 
 - package as pip
@@ -120,6 +121,6 @@ x race condition in wait for setup.tar where only part of file is present
 x test coreos reboots
 x kubectl with vagrant
 x vagrant cache docker
-test nfs permissions issues
+x test nfs permissions issues
 mount gce disks
 services kubectl can fail in race, on logging with fluentd
