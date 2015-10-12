@@ -4,12 +4,12 @@
 # ENVIRONMENT={development, production}
 ENVIRONMENT=production
 # PROVIDER={gce, vagrant}
-PROVIDER=gce
+PROVIDER=vagrant
 
 # KUBERNETES
-KUBE_LOGGING=true
-KUBE_MONITORING=true
-KUBE_GCR_CREDENTIALS=true
+KUBE_LOGGING=false
+KUBE_MONITORING=false
+KUBE_GCR_CREDENTIALS=false
 
 # GCE
 GCE_INSTANCE_NAME=testinstance

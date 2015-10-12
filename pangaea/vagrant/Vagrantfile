@@ -144,6 +144,7 @@ Vagrant.configure("2") do |config|
         end
       end
 
+      config.vm.provision :shell, :inline => "rm -rf /opt/tmp/setup", :privileged => true
       config.vm.provision :file, :source => SETUP_TAR, :destination => "/tmp/setup.tar"
       config.vm.provision :file, :source => SETUP_MD5, :destination => "/tmp/setup.md5"
 

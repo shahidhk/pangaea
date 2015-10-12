@@ -26,7 +26,7 @@ function get_apiserver_ip() {
     KUBE_NODE=https://$KUBE_NODE
     KUBE_NAME=$GCE_INSTANCE_NAME
   else
-    KUBE_NODE=http://127.0.0.1:8080
+    KUBE_NODE=https://127.0.0.1:1443
     KUBE_NAME=vagrant
   fi
 }

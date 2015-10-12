@@ -17,7 +17,7 @@
 
 # Enable port forwarding from guest(s) to host machine, syntax is: { 80 => 8080 }, auto correction is enabled by default.
 #$forwarded_ports = {}
-$forwarded_ports = { 8080 => 8080 }
+$forwarded_ports = { 443 => 1443 }
 
 # Enable port forwarding of Docker TCP socket
 # Set to the TCP port you want exposed on the *host* machine, default is 2375

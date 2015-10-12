@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # init ssl and setup archive, to be uploaded to kubernetes node during bootstrap
-#
 
 INSTANCE_NAME=$1
 NODE_IP=$2
@@ -17,7 +16,7 @@ function init_ssl {
     rm -rf "$SSL_TARBALL_PATH"
 
     mkdir -p "$SSL_TARBALL_PATH"
-    "$SSL_INIT_SCRIPT_PATH" "$SSL_TARBALL_PATH" IP.1=10.3.0.1,IP.2=$NODE_IP
+    "$SSL_INIT_SCRIPT_PATH" "$SSL_TARBALL_PATH" IP.1=10.3.0.1,IP.2=$NODE_IP,IP.3=127.0.0.1
 
     cp "$SSL_TARBALL_PATH/controller.tar" "$PKI_DIR/keys/_CURRENT.tar"
 }
