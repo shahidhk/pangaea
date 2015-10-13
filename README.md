@@ -1,32 +1,26 @@
 # Pangaea
 
-Point and shoot Kubernetes.
+Point and shoot Kubernetes. For Vagrant and GCE.
 
 Configure settings in `.pangaea` in your project root.
 
-## Vagrant
+For detailed instructions, see the [documentation](TODO)
+
+## Example Usage
+
 ```bash
-cd providers/vagrant
-vagrant up        # bring up Kubernetes node
-vagrant suspend   # pause Kubernetes node
+# Vagrant
+export VAGRANT_CWD=$PWD/pangaea/vagrant
+                       # see the documentation for other ways to configure the environment
+vagrant up             # bring up Kubernetes node
+kubectl get po         # works with VM node
+vagrant down           # bring down node
+
+# GCE
+providers/gce/up.sh    # bring up Kubernetes node
+kubectl get po         # works with GCE node
+providers/gce/down.sh  # bring down node
 ```
-
-## GCE
-```bash
-providers/gce/up.sh     # bring up Kubernetes node
-providers/gce/down.sh   # bring down node
-```
-## Requirements
-- vagrant, virtualbox  
-    vagrant plugin install vagrant-vbox-snapshot
-- gcloud
-- jq
-- kubectl
-
-## TODO
-
-- See the file `spec.md`
-- Better documentation, and setting shims for tools is a priority
 
 ## Contributions ##
 
@@ -36,7 +30,5 @@ Thanks to:
 - [CoreoOS Vagrant](https://github.com/coreos/coreos-vagrant)
 - [CoreoOS Kubernetes](https://github.com/coreos/coreos-kubernetes)
 - [Kubernetes](https://github.com/kubernetes/kubernetes)
-
-Although fully usable, this is a preview release under ongoing development.
 
 Ideas and issues are welcome.

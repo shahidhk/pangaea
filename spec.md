@@ -26,7 +26,7 @@
 - test bug where external loadbalancer open connection prevents kube-proxy setup
 
 - package as pip
-- gce mount disk
+- gce mount disk on compute
 - documentation
 
 logging and monitoring
@@ -109,18 +109,3 @@ pangaea
     node environment
       bash based compiler
 
-# Configuring gcloud
-gcloud auth login
-gcloud config set project tfc-glassic
-gcloud config set compute/zone asia-east1-a
-
-# Next tasks
-x curl multiple document kubernetes object
-x vagrant cache kubernetes binaries
-x race condition in wait for setup.tar where only part of file is present
-x test coreos reboots
-x kubectl with vagrant
-x vagrant cache docker
-x test nfs permissions issues
-mount gce disks
-services kubectl can fail in race, on logging with fluentd

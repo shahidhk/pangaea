@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # OPTIONS
-# ENVIRONMENT={development, production}
-ENVIRONMENT=production
 # PROVIDER={gce, vagrant}
 PROVIDER=gce
 
