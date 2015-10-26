@@ -26,7 +26,12 @@ function init_setup_archive {
     local SETUP_MD5=$ROOT_DIR/.tmp/setup.md5
 
     tar -zcf "$SETUP_TAR" -C "$ROOT_DIR" .pangaea pangaea
-    md5sum "$SETUP_TAR" | cut -f 1 -d " " > "$SETUP_MD5"
+
+    if which md5sum; then # linux
+        md5sum "$SETUP_TAR" | cut -f 1 -d " " > "$SETUP_MD5"
+    else # mac
+        md5 -q "$SETUP_TAR" > "$SETUP_MD5"
+    fi
 }
 
 init_ssl

@@ -14,9 +14,9 @@ function init_kube_binaries {
     local CWD=$TMP_PATH
 
     local K8S_VER=v1.0.6
-    local K8S_BINARY_HASH=a9e46f18ffd67602619cd2f88472c71a
+    local K8S_BINARY_MD5=a9e46f18ffd67602619cd2f88472c71a
 
-    if ! md5sum -c <(echo "$K8S_BINARY_HASH  $CWD/kubernetes.tar.gz"); then
+    if ! md5sum -c <(echo "$K8S_BINARY_MD5  $CWD/kubernetes.tar.gz"); then
         echo "PAN: downloading Kubernetes binaries"
         curl -L -o $CWD/kubernetes.tar.gz https://github.com/kubernetes/kubernetes/releases/download/$K8S_VER/kubernetes.tar.gz
     else
@@ -51,6 +51,9 @@ function init_setup_and_ssl {
         while ! md5sum -c <(echo "$(cat $SETUP_MD5)  $SETUP_TAR"); do
           sleep 2
         done
+
+        cp $SETUP_TAR $TMP_PATH
+        cp $SETUP_MD5 $TMP_PATH
 
         mkdir -p $TMP_PATH/setup
         tar -C $TMP_PATH/setup -xzf $SETUP_TAR
