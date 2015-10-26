@@ -44,7 +44,7 @@ The `Vagrantfile` is at `pangaea/vagrant/Vagrantfile`
 Either set `VAGRANT_CWD` to this path and use Vagrant normally, or use the wrapper script `pangaea/bin/vagrant` that figures it out depending on the current working directory
 
 ```bash
-pangaea/bin/kubesetup.sh  # Give me a bare Kubernetes node
+pangaea/vagrant/kubesetup.sh  # Give me a bare Kubernetes node
 # runs vagrant up, and provisions the Kubernetes node
 # waits for Kubernetes set up
 # snapshots the VM so that subsequent runs will not redownload the internet
