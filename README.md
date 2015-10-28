@@ -4,7 +4,7 @@ Point and shoot Kubernetes. For Vagrant and GCE.
 
 Configure settings in `.pangaea` in your project root.
 
-For detailed instructions, see the [documentation](TODO)
+For detailed instructions, see the [documentation](pangaea/docs/README.md)
 
 ## Example Usage
 

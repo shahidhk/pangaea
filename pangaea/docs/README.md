@@ -11,13 +11,15 @@ Point and shoot Kubernetes. For Vagrant and GCE.
         - kubectl_setup
         - Google Cloud Registry credentials
 - Future Work and Limitations
-- Further Reading
+
+This document is meant to be used as a reference. For step by step instructions, see the [Workflow Guide](workflow.md)
 
 ## Installation
 
 - Clone this repository to your project root
 - Dependencies
     - For Vagrant: vagrant, virtualbox, nfs server  
+        then install these vagrant plugins  
         `vagrant plugin install vagrant-vbox-snapshot`  
         `vagrant plugin install vagrant-triggers`
     - For GCE: gcloud, jq
@@ -52,13 +54,14 @@ pangaea/vagrant/kubesetup.sh  # Give me a bare Kubernetes node
 # Subsequently, use Vagrant like normal
 
 pangaea/bin/vagrant up    # Bring up node
-kubectl get po            # Working Kubernetes
+kubectl get po            # Verify working Kubernetes
 pangaea/bin/vagrant halt  # Bring down node
 ```
 
 ### GCE
 
-Set `PROVIDER=gce` in `.pangaea`  
+In `.pangaea`  
+Set `PROVIDER=gce`  
 Set `GCE_INSTANCE_NAME` to the name of the compute resource you want to create
 
 ```bash
@@ -86,6 +89,7 @@ Share the folder named after your instance under `pangaea/pki/keys` with your te
 ```bash
 pangaea/bin/kubectl_setup  # Sets up local kubectl config to work with the Kubernetes node
 # Depends on the value of PROVIDER in .pangaea
+# If PROVIDER=gce, GCE_INSTANCE_NAME must be set correctly in .pangaea and the corresponding certs must be present in pangaea/pki/keys
 ```
 
 #### Enable your Kubernetes node to download images from a private Google Cloud Registry
@@ -112,6 +116,6 @@ This is for Vagrant based set ups, or cross project GCE downloads.
 
 ## Further Reading
 
-TODO: what sections here?
+TODO:
 - How it Works and Additional Options
 - An Opinionated Workflow Using Pangaea
