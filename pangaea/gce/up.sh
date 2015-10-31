@@ -23,7 +23,6 @@ CREATED_JSON=$ROOT_DIR/.tmp/gce_instance_create.json
 gcloud compute instances create "$GCE_INSTANCE_NAME" \
     --image coreos \
     --metadata-from-file user-data="$CLOUD_CONFIG" \
-    --zone asia-east1-a \
     --machine-type n1-standard-2 \
     --boot-disk-size 20GB \
     --boot-disk-type pd-ssd \
