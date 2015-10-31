@@ -2,16 +2,16 @@
 
 set -e
 
-TMP_PATH=/opt/tmp
-mkdir -p $TMP_PATH
+PANWD=/opt/panwd
+mkdir -p $PANWD
 
 # setup files like installation scripts and pki keys
-PANGAEA_PATH=$TMP_PATH/setup/pangaea
+PANGAEA_PATH=$PANWD/setup/pangaea
 
 function init_kube_binaries {
     [ ! -x /opt/bin/kubectl ] || return 0
 
-    local CWD=$TMP_PATH
+    local CWD=$PANWD
 
     local K8S_VER=v1.0.6
     local K8S_BINARY_MD5=a9e46f18ffd67602619cd2f88472c71a
@@ -47,19 +47,19 @@ function init_setup_and_ssl {
     local SETUP_TAR=/tmp/setup.tar
     local SETUP_MD5=/tmp/setup.md5
 
-    if [ ! -e $TMP_PATH/setup ]; then
+    if [ ! -e $PANWD/setup ]; then
         while ! md5sum -c <(echo "$(cat $SETUP_MD5)  $SETUP_TAR"); do
           sleep 2
         done
 
-        cp $SETUP_TAR $TMP_PATH
-        cp $SETUP_MD5 $TMP_PATH
+        cp $SETUP_TAR $PANWD
+        cp $SETUP_MD5 $PANWD
 
-        mkdir -p $TMP_PATH/setup
-        tar -C $TMP_PATH/setup -xzf $SETUP_TAR
+        mkdir -p $PANWD/setup
+        tar -C $PANWD/setup -xzf $SETUP_TAR
 
         mkdir -p /etc/kubernetes/ssl
-        tar -C /etc/kubernetes/ssl -xf $TMP_PATH/setup/pangaea/pki/keys/_CURRENT.tar
+        tar -C /etc/kubernetes/ssl -xf $PANWD/setup/pangaea/pki/keys/_CURRENT.tar
     fi
 }
 

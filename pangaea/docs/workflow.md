@@ -17,6 +17,7 @@ To upgrade Pangaea
 - `git remote add pangaea git@github.com:hasura/pangaea.git`
 - `git fetch pangaea`
 - `git merge pangaea/master`
+- See the Upgrading section under Vagrant and GCE below
 
 ## Step 2: Directory Structure and Creating a Customized nginx
 
@@ -214,6 +215,10 @@ $forwarded_ports = { 443 => 1443, 30080 => 8080 }
 - `vagrant snapshot go NameOfSnapshot -r`
 - The -r flag does a vagrant reload after reverting to the snapshot
 
+### Upgrading Pangaea
+
+- `vagrant reload`
+
 ## Step 5: Moving to Production
 
 In production we want to run fully self contained containers so that we have an absolutely reproducable and scalable system.
@@ -276,6 +281,13 @@ GCE_DISK_MOUNTS=(
 - If the instance already exists, attach the disks to the instance, otherwise they will be attached on create
 - `gcloud compute instances attach-disk name-of-instance --disk disk-name`
 - Create/upgrade the instance
+
+### Upgrading Pangaea
+
+- Set GCE_INSTANCE_NAME in .pangaea
+- Make sure you have the right credentials available
+- `pangaea/gce/upgrade.sh`
+- This will reboot the instance
 
 ## Further Study
 

@@ -13,7 +13,7 @@ Point and shoot Kubernetes. For Vagrant and GCE.
 - Future Work and Limitations
 - Contributions
 
-This document is meant to be used as a reference. For step by step instructions, see the [Workflow Guide](pangaea/docs/workflow.md)
+This document is meant to be used as a reference. For step by step instructions and detailed documentation, see the [Workflow Guide](pangaea/docs/workflow.md)
 
 ## Installation
 

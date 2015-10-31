@@ -139,12 +139,12 @@ Vagrant.configure("2") do |config|
 
       config.vm.provision "trigger", :option => "value" do |trigger|
         trigger.fire do
-          run "%s vagrant #{ip}" % (abs_path 'pangaea/setup/init_ssl_and_setup_archive.sh')
+          run "%s create vagrant #{ip}" % (abs_path 'pangaea/setup/init_ssl_and_setup_archive.sh')
           run %Q("#{abs_path 'pangaea/bin/kubectl_setup'}")
         end
       end
 
-      config.vm.provision :shell, :inline => "rm -rf /opt/tmp/setup", :privileged => true
+      config.vm.provision :shell, :inline => "rm -rf /tmp/setup.tar /opt/panwd/setup", :privileged => true
       config.vm.provision :file, :source => SETUP_TAR, :destination => "/tmp/setup.tar"
       config.vm.provision :file, :source => SETUP_MD5, :destination => "/tmp/setup.md5"
 

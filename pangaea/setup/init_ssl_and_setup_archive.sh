@@ -1,23 +1,30 @@
 #!/bin/bash
 
-# init ssl and setup archive, to be uploaded to kubernetes node during bootstrap
+# init ssl and setup archive to be uploaded to kubernetes node during bootstrap
 
-INSTANCE_NAME=$1
-NODE_IP=$2
+set -e
+
+CREATE_OR_UPGRADE=$1
+INSTANCE_NAME=$2
+
+NODE_IP=$3
 
 SCRIPT_DIR=$(dirname $0)
 ROOT_DIR=$SCRIPT_DIR/../..
 
+PKI_DIR=$ROOT_DIR/pangaea/pki
+SSL_TARBALL_PATH=$PKI_DIR/keys/$INSTANCE_NAME
+
 function init_ssl {
-    local PKI_DIR=$ROOT_DIR/pangaea/pki
-    local SSL_TARBALL_PATH=$PKI_DIR/keys/$INSTANCE_NAME
     local SSL_INIT_SCRIPT_PATH=$PKI_DIR/init-ssl
 
     rm -rf "$SSL_TARBALL_PATH"
 
     mkdir -p "$SSL_TARBALL_PATH"
     "$SSL_INIT_SCRIPT_PATH" "$SSL_TARBALL_PATH" IP.1=10.3.0.1,IP.2=$NODE_IP,IP.3=127.0.0.1
+}
 
+function init_ssl_archive {
     cp "$SSL_TARBALL_PATH/controller.tar" "$PKI_DIR/keys/_CURRENT.tar"
 }
 
@@ -34,6 +41,9 @@ function init_setup_archive {
     fi
 }
 
-init_ssl
+if [ $CREATE_OR_UPGRADE = create ]; then
+    init_ssl
+fi
+init_ssl_archive
 init_setup_archive
 
