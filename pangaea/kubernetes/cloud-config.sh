@@ -63,11 +63,23 @@ function init_setup_and_ssl {
     fi
 }
 
+function gce_disk_mount {
+    while [ ! $# -eq 0 ]; do
+        mkdir -p "$2"
+        "$PANGAEA_PATH/gce/safe_format_and_mount" -m "mkfs.ext4 -F" /dev/disk/by-id/google-$1 "$2"
+        shift 2
+    done
+}
+
 init_kube_binaries
 init_setup_and_ssl
 
 SETUP_OPT_FILE=$PANGAEA_PATH/../.pangaea
 source "$SETUP_OPT_FILE"
+
+if [ $PROVIDER = gce ]; then
+    gce_disk_mount "${GCE_DISK_MOUNTS[@]}"
+fi
 
 source "$PANGAEA_PATH/kubernetes/kubernetes-installer.sh"
 

@@ -27,7 +27,7 @@ function init_setup_archive {
 
     tar -zcf "$SETUP_TAR" -C "$ROOT_DIR" .pangaea pangaea
 
-    if which md5sum; then # linux
+    if which md5sum &>/dev/null; then # linux
         md5sum "$SETUP_TAR" | cut -f 1 -d " " > "$SETUP_MD5"
     else # mac
         md5 -q "$SETUP_TAR" > "$SETUP_MD5"
