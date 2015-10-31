@@ -20,12 +20,24 @@ CLOUD_CONFIG=$ROOT_DIR/pangaea/kubernetes/cloud-config.sh
 
 CREATED_JSON=$ROOT_DIR/.tmp/gce_instance_create.json
 
+GCE_DISK_ARGS=""
+function generate_gce_disk_args {
+    while [ ! $# -eq 0 ]; do
+        GCE_DISK_ARGS="$GCE_DISK_ARGS --disk name=$1,device-name=$1"
+        shift 2
+    done
+}
+generate_gce_disk_args "${GCE_DISK_MOUNTS[@]}"
+
 gcloud compute instances create "$GCE_INSTANCE_NAME" \
-    --image coreos \
-    --metadata-from-file user-data="$CLOUD_CONFIG" \
+\
     --machine-type n1-standard-2 \
     --boot-disk-size 20GB \
     --boot-disk-type pd-ssd \
+\
+    $GCE_DISK_ARGS \
+    --image coreos \
+    --metadata-from-file user-data="$CLOUD_CONFIG" \
     --scopes https://www.googleapis.com/auth/cloud.useraccounts.readonly,https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/compute \
     --format json > "$CREATED_JSON"
 

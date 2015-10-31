@@ -10,4 +10,7 @@ KUBE_MONITORING=false
 KUBE_GCR_CREDENTIALS=false
 
 # GCE
-GCE_INSTANCE_NAME=dev-staging
+GCE_INSTANCE_NAME=testin
+GCE_DISK_MOUNTS=(
+#   diskname mountpath
+)
