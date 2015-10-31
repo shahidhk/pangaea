@@ -104,7 +104,7 @@ This is for Vagrant based set ups, or cross project GCE downloads.
 - Follow the "How To > Get the Credentials" section at [Google JWT Token](https://github.com/hasura/google-jwt-gcr-token-docker)
 - Put files in a directory as in the [example](https://github.com/hasura/kubetemplate/tree/master/example). Edit the `.kubetemplate` file to include the filename of the JSON you downloaded.
 - In that directory, run `kubet` to generate the compiled `secret.yaml`
-- `kubectl create -f secret.yaml`
+- `kubectl create -f secret.yaml --namespace=kube-system`
 
 ## Future Work and Limitations
 
