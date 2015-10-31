@@ -260,6 +260,23 @@ In production we want to run fully self contained containers so that we have an 
 - Configure kubectl
 - `pangaea/bin/kubectl_setup`
 
+### Mounting GCE disks
+
+- First create the GCE disks manually, use pangaea/gce/disks_create.sh for reference
+- `gcloud compute disks create disk-name --size 100GB`
+- Edit .pangaea to include the disk names and mount points in variable GCE_DISK_MOUNTS
+- `vim .pangaea`
+```shell
+# ...
+GCE_DISK_MOUNTS=(
+    disk-name /path/to/mount/disk
+)
+# ...
+```
+- If the instance already exists, attach the disks to the instance, otherwise they will be attached on create
+- `gcloud compute instances attach-disk name-of-instance --disk disk-name`
+- Create/upgrade the instance
+
 ## Further Study
 
 - The idea is to crystallize all our knowledge, and all tasks we do more than once in scripts
