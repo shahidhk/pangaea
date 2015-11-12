@@ -118,7 +118,7 @@ This is for Vagrant based set ups, or cross project GCE downloads.
 
 ## Contributions ##
 
-Put together by [akshaya01](https://github.com/akshaya01) at [Hasura](http://hasura.io)
+Put together by [nullxone](https://github.com/nullxone) at [Hasura](http://hasura.io)
 
 Thanks to:
 - [CoreoOS Vagrant](https://github.com/coreos/coreos-vagrant)

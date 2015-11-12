@@ -282,6 +282,12 @@ GCE_DISK_MOUNTS=(
 - `gcloud compute instances attach-disk name-of-instance --disk disk-name`
 - Create/upgrade the instance
 
+### Forward Docker and systemd Logs
+
+- set LOGROTATE_DOCKER to true in .pangaea
+- [create](https://cloud.google.com/storage/docs/gsutil/commands/mb) a google cloud storage bucket
+- use [logforward-gce](https://github.com/hasura/logforward-gce) to forward logs to the bucket
+
 ### Upgrading Pangaea
 
 - Set GCE_INSTANCE_NAME in .pangaea
