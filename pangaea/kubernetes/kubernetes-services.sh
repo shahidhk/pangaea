@@ -425,3 +425,5 @@ function start_addons {
 
 init_templates
 start_addons
+
+echo "PAN: bootstrap setup complete"

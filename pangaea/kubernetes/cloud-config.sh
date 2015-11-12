@@ -71,6 +71,53 @@ function gce_disk_mount {
     done
 }
 
+function logrotate {
+    local TEMPLATE=/etc/logrotate.d/docker
+    [ -f $TEMPLATE ] || {
+        echo "TEMPLATE: $TEMPLATE"
+        mkdir -p $(dirname $TEMPLATE)
+        cat << EOF > $TEMPLATE
+/var/lib/docker/containers/*/*.log {
+dateext
+rotate 10
+compress
+delaycompress
+size=10M
+missingok
+notifempty
+copytruncate
+}
+EOF
+    }
+
+    local TEMPLATE=/etc/systemd/system/logrotate-docker.service
+    [ -f $TEMPLATE ] || {
+        echo "TEMPLATE: $TEMPLATE"
+        mkdir -p $(dirname $TEMPLATE)
+        cat << EOF > $TEMPLATE
+[Unit]
+Description=Logrotate docker logs
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/logrotate -v /etc/logrotate.d/docker
+EOF
+    }
+
+    local TEMPLATE=/etc/systemd/system/logrotate-docker.timer
+    [ -f $TEMPLATE ] || {
+        echo "TEMPLATE: $TEMPLATE"
+        mkdir -p $(dirname $TEMPLATE)
+        cat << EOF > $TEMPLATE
+[Unit]
+Description=Logrotate docker logs daily
+
+[Timer]
+OnCalendar=daily
+EOF
+    }
+}
+
 init_kube_binaries
 init_setup_and_ssl
 
@@ -79,6 +126,11 @@ source "$SETUP_OPT_FILE"
 
 if [ $PROVIDER = gce ]; then
     gce_disk_mount "${GCE_DISK_MOUNTS[@]}"
+fi
+
+if [ $LOGROTATE_DOCKER = true ]; then
+    logrotate
+    systemctl start logrotate-docker.timer
 fi
 
 source "$PANGAEA_PATH/kubernetes/kubernetes-installer.sh"
