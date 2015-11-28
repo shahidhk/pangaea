@@ -13,8 +13,8 @@ function init_kube_binaries {
 
     local CWD=$PANWD
 
-    local K8S_VER=v1.0.6
-    local K8S_BINARY_MD5=a9e46f18ffd67602619cd2f88472c71a
+    local K8S_VER=v1.1.2
+    local K8S_BINARY_MD5=b1afb1f08af97c7da5d1a30e1810f42b
 
     if ! md5sum -c <(echo "$K8S_BINARY_MD5  $CWD/kubernetes.tar.gz"); then
         echo "PAN: downloading Kubernetes binaries"
