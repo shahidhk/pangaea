@@ -4,6 +4,26 @@ Pangaea is a collection of scripts designed primarily to make working on the Kub
 
 See the [README](README.md) for a super brief summary instead.
 
+- Step 1: Setup
+- Step 2: Directory Structure and Creating a Customized nginx
+- Step 3: Run the nginx Container
+  - Kubernetes Object Specs
+  - Start the App on Kubernetes
+- Step 4: Local Development
+  - Set Up Kubernetes
+  - Making Changes in Development
+  - Setting Up Port Forwarding
+  - Using Virtualbox Snapshots Effectively
+  - Upgrading Pangaea
+- Step 5: Moving to Production
+  - Create the Production Instance
+  - Set Up the Application
+  - Share the Setup With Your Team
+  - Mounting GCE disks
+  - Forward Docker and systemd Logs
+  - Upgrading Pangaea
+- Further Study
+
 ## Step 1: Setup
 
 - Clone this repository, this will serve as the root project folder for the application
@@ -21,7 +41,7 @@ To upgrade Pangaea
 - `git merge pangaea/master`
 - See the Upgrading section under Vagrant and GCE below
 
-## Step 2: Directory Structure and Creating a Customized nginx
+## Step 2: Directory Structure and Creating a Customized nginx Container
 
 - Assuming the current working directory is the project root
 - Create a folder to hold the application called app
@@ -43,7 +63,7 @@ COPY html /usr/share/nginx/html
 - `docker push reponame/nginxcustomized`
 - `cd -`
 
-## Step 3: Run the nginx
+## Step 3: Run the nginx Container
 
 Run the Docker image built in the previous step on a Vagrant VM that runs Kubernetes.
 

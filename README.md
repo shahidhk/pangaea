@@ -1,15 +1,18 @@
 # Pangaea
 
 Point and shoot Kubernetes. For Vagrant and GCE.
+- To treat a Kubernetes cluster and Kubernetes nodes as the fundamental units of infrastructure, abstracting out the underlying provider
+- Enable excellent developer workflow
 
+Contents
 - Installation
 - Usage
-    - Config
     - Vagrant
     - GCE
     - Other Scripts
         - kubectl_setup
         - Google Cloud Registry credentials
+        - Logging and Monitoring
 - Future Work and Limitations
 - Contributions
 
@@ -97,7 +100,7 @@ This is for Vagrant based set ups, or cross project GCE downloads.
 - Put files in a directory as in the [example](https://github.com/hasura/kubetemplate/tree/master/example). Edit the `.kubetemplate` file to include the filename of the JSON you downloaded.
 - In that directory, run `kubet` to generate the compiled `secret.yaml`
 - `kubectl create -f secret.yaml --namespace=kube-system`
-- Run the gcr-docker-credentials commponent
+- Run the gcr-docker-credentials component
 - `kubectl create -f pangaea/components/gcr-docker-credentials`
 
 #### Logging and Monitoring
@@ -118,8 +121,8 @@ This is for Vagrant based set ups, or cross project GCE downloads.
 Put together by [nullxone](https://github.com/nullxone) at [Hasura](http://hasura.io)
 
 Thanks to:
-- [CoreoOS Vagrant](https://github.com/coreos/coreos-vagrant)
-- [CoreoOS Kubernetes](https://github.com/coreos/coreos-kubernetes)
+- [CoreOS Vagrant](https://github.com/coreos/coreos-vagrant)
+- [CoreOS Kubernetes](https://github.com/coreos/coreos-kubernetes)
 - [Kubernetes](https://github.com/kubernetes/kubernetes)
 
 Ideas and issues are welcome.
