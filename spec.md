@@ -21,38 +21,15 @@
 
 # Tasks
 
-- specify loadBalancerIP (on release v1.1.0)
-- specify gcePersistentDisk for pod mounts (on v1.1.0)
 - test bug where external loadbalancer open connection prevents kube-proxy setup
-
-- package as pip
-- gce mount disk on compute
-- documentation
 
 logging and monitoring
 - on google services, allow external access
 - persistent storage
 - logrotate
 
-- expose service ports as nodeports, enable and disable
-
-- vagrant mount permissions
-- complete env tooling
-
-- requirements installer
-    gcloud, kubectl, vagrant, nfsd, jq
-- compile outputs list of files
-- broken pipe on env, env.py:24 stdout write vs print
-- test on
-    create
-    machine reboot
-
 later
-- mount cloud init file for debugging
-- fswatch for compilation
 - secure cluster, kube and etcd
-- automatically mount caches for stuff like docker, archive file
-- Dockerfile builds, understand current workflow
 
 # Pangaea command line tool
 
