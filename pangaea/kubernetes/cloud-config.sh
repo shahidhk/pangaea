@@ -133,6 +133,8 @@ if [ $LOGROTATE_DOCKER = true ]; then
     systemctl start logrotate-docker.timer
 fi
 
-source "$PANGAEA_PATH/kubernetes/kubernetes-installer.sh"
+# Needed if we're going to use service account credentials outside of the current GCE instance project
+# for instance with Vagrant and the gcr-docker-credentials component
+touch "/var/lib/kubelet/.dockercfg"
 
-source "$PANGAEA_PATH/kubernetes/kubernetes-services.sh"
+source "$PANGAEA_PATH/kubernetes/kubernetes-installer.sh"
