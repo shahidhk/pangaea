@@ -31,14 +31,6 @@ This document is meant to be used as a reference. For step by step instructions 
 All commands assuming that the current directory is the project root  
 You may want to add `pangaea/bin` to your `PATH`
 
-### Config
-
-All configuration is set in `.pangaea` in the project root
-
-`KUBE_LOGGING` enables the logging addon using fluentd, elasticsearch, and kibana  
-`KUBE_MONITORING` enables the monitoring addon using kubelet's cadvisor, influxdb, and grafana  
-`KUBE_GCR_CREDENTIALS` sets up credentials so that the Kubernetes node can pull images from a private Docker Google Cloud Registry
-
 ### Vagrant
 
 Set `PROVIDER=vagrant` in `.pangaea`
@@ -105,14 +97,19 @@ This is for Vagrant based set ups, or cross project GCE downloads.
 - Put files in a directory as in the [example](https://github.com/hasura/kubetemplate/tree/master/example). Edit the `.kubetemplate` file to include the filename of the JSON you downloaded.
 - In that directory, run `kubet` to generate the compiled `secret.yaml`
 - `kubectl create -f secret.yaml --namespace=kube-system`
+- Run the gcr-docker-credentials commponent
+- `kubectl create -f pangaea/components/gcr-docker-credentials`
+
+#### Logging and Monitoring
+
+- Logging with elasticsearch and kibana
+- `kubectl create -f pangaea/components/logging-es-kibana`
+- Monitoring with influxdb and grafana
+- `kubectl create -f pangaea/components/monitoring-influxdb-grafana`
 
 ## Future Work and Limitations
 
-- Specify Kubernetes load balancer IP address (to be fixed on Kubernetes v1.1.0)
-- Specify gcePersistentDisk for pod mounts (to be fixed on Kubernetes v1.1.0)
-- Persistent storage for logging and monitoring addons
 - Logrotate and storage management for addons
-- CoreOS logrotate and storage management for logs
 - Multi-node Kubernetes cluster, with ability to add and remove compute/storage
 - Some more notes in spec.md
 

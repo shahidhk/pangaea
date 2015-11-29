@@ -2,6 +2,8 @@
 
 Pangaea is a collection of scripts designed primarily to make working on the Kubernetes platform more efficient. Here's an opinionated guide on how to develop a containerized application on your local machine with Vagrant, and then deploy it to GCE. We use an nginx container with a customized index page as an example.
 
+See the [README](README.md) for a super brief summary instead.
+
 ## Step 1: Setup
 
 - Clone this repository, this will serve as the root project folder for the application
@@ -94,10 +96,7 @@ Bring up a Kubernetes node
 
 - Set the following in the .pangaea file
     - `PROVIDER=vagrant`
-    - `KUBE_LOGGING` and `KUBE_MONITORING` to either true or false
-    - `KUBE_GCR_CREDENTIALS=true` if you intend to use GCR as your private Docker repository
 - `pangaea/vagrant/kubesetup.sh`
-- If you're using GCR to host your Docker images, follow the section 'Enable your Kubernetes node to download images from a private Google Cloud Registry' on [README](README.md)
 
 Let's now run the nginx container on Kubernetes
 
