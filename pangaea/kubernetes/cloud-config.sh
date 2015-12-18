@@ -135,7 +135,7 @@ fi
 
 # Needed if we're going to use service account credentials outside of the current GCE instance project
 # for instance with Vagrant and the gcr-docker-credentials component
-mkdir /var/lib/kubelet
+mkdir -p /var/lib/kubelet
 touch /var/lib/kubelet/.dockercfg
 
 source "$PANGAEA_PATH/kubernetes/kubernetes-installer.sh"
