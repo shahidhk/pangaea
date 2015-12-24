@@ -22,6 +22,7 @@ See the [README](README.md) for a super brief summary instead.
   - Mounting GCE disks
   - Forward Docker and systemd Logs
   - Upgrading Pangaea
+- Step 6: Helpful Scripts
 - Further Study
 
 ## Step 1: Setup
@@ -313,6 +314,10 @@ GCE_DISK_MOUNTS=(
 - Make sure you have the right credentials available
 - `pangaea/gce/upgrade.sh`
 - This will reboot the instance
+
+## Step 6: Helpful Scripts
+
+- Bash completion: source [this file](https://github.com/kubernetes/kubernetes/blob/master/contrib/completions/bash/kubectl)
 
 ## Further Study
 
