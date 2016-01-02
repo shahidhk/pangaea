@@ -66,14 +66,28 @@ gcloud auth login
 gcloud config set project sample-project
 gcloud config set compute/zone asia-east1-a
 
-pangaea/gce/up.sh    # Creates a GCE based Kubernetes node
+# Create a GCE boot disk with CoreOS image
+gcloud compute disks create disk-name --image coreos
+# Edit .pangaea to include this boot disk in variable GCE_BOOT_DISK_MOUNTS
+vim .pangaea
+# ...
+GCE_BOOT_DISK_MOUNTS=(
+    disk-name /
+)
+# ...
+
+pangaea/gce/up.sh setup # Creates a GCE based Kubernetes node with the boot disk, create and attach a static external IP to it.
 # Provisions the Kubernetes node
 # Opens the firewall to the secure endpoint of the Kubernetes API server
 # Sets up local kubectl to work with the Kubernetes node
 
 kubectl get po       # Working Kubernetes
 
-pangaea/gce/down.sh  # Destroys the compute instance, and deletes the firewall entry
+pangaea/gce/down.sh  # Destroys the compute instance, and deletes the firewall entry, but IP is still reserved.
+
+pangaea/gce/up.sh    # Creates a new VM and attach the same boot disk, same IP, so that state is preserved.
+
+pangaea/gce/down.sh setup # Destroys the VM, firewall and reserved static IP. Will have to use a fresh boot disk now.
 ```
 
 Share the folder named after your instance under `pangaea/pki/keys` with your team and have them run `pangaea/bin/kubectl_setup` to config their workstation kubectl to work with the GCE instance.

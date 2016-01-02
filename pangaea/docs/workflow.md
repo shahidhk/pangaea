@@ -302,6 +302,24 @@ GCE_DISK_MOUNTS=(
 - `gcloud compute instances attach-disk name-of-instance --disk disk-name`
 - Create/upgrade the instance
 
+### Mounting GCE Boot disks
+
+A persistant disk can be used as the root filesystem so that the kubernetes state is preserved when the machine is restarted.
+
+- Create the GCE boot disk with a CoreOS image
+- `gcloud compute disks create disk-name --image coreos`
+- Edit .pangaea to include this boot disk in variable GCE_BOOT_DISK_MOUNTS
+- vim .pangaea
+```shell
+# ...
+GCE_BOOT_DISK_MOUNTS=(
+    disk-name /
+)
+# ...
+```
+- The disk will be mounted when `pangaea/gce/up.sh` is run and the machine boots from the disk.
+- When the VM is destroyed, the disk will be preserved
+
 ### Forward Docker and systemd Logs
 
 - set LOGROTATE_DOCKER to true in .pangaea
