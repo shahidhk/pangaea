@@ -308,13 +308,11 @@ A persistant disk can be used as the root filesystem so that the kubernetes stat
 
 - Create the GCE boot disk with a CoreOS image
 - `gcloud compute disks create disk-name --image coreos`
-- Edit .pangaea to include this boot disk in variable GCE_BOOT_DISK_MOUNTS
+- Edit .pangaea to include this boot disk in variable GCE_BOOT_DISK
 - vim .pangaea
 ```shell
 # ...
-GCE_BOOT_DISK_MOUNTS=(
-    disk-name /
-)
+GCE_BOOT_DISK_MOUNTS=disk-name
 # ...
 ```
 - The disk will be mounted when `pangaea/gce/up.sh` is run and the machine boots from the disk.

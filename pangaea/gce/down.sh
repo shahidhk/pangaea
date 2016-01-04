@@ -5,7 +5,6 @@ set -e
 SCRIPT_DIR=`dirname $0`
 ROOT_DIR=$SCRIPT_DIR/../..
 
-EXT_IP_CREATED_JSON=$ROOT_DIR/.tmp/gce_ext_ip_create.json
 COMMAND=$1
 
 source $ROOT_DIR/.pangaea
