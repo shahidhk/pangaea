@@ -23,7 +23,7 @@ CREATED_JSON=$ROOT_DIR/.tmp/gce_instance_create.json
 GCE_DISK_ARGS=""
 function generate_gce_disk_args {
     while [ ! $# -eq 0 ]; do
-        GCE_DISK_ARGS="$GCE_DISK_ARGS --disk name=$1,device-name=$1"
+        GCE_DISK_ARGS="$GCE_DISK_ARGS --disk name=$1,device-name=$2"
         shift 2
     done
 }
