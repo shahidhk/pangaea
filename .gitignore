@@ -6,6 +6,7 @@ pangaea/vagrant/.vagrant
 
 pangaea/vagrant/.srl
 pangaea/gce/.srl
+pangaea/azure/.srl
 
 *.pyc
 

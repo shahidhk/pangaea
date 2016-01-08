@@ -12,4 +12,4 @@ ROOT_DIR=$SCRIPT_DIR/../..
 
 source "$ROOT_DIR/.pangaea"
 
-ssh -i "$ROOT_DIR/pangaea/pki/$AZURE_NAME/login_key" $1
+ssh -i "$ROOT_DIR/pangaea/pki/keys/$AZURE_NAME/login_key" core@$1
