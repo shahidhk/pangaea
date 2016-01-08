@@ -262,7 +262,7 @@ In production we want to run fully self contained containers so that we have an 
 - The `init` subcommand is important when it the first boot after the boot disk has been created.
     - It creates the required certificates and keys and set them up both on server and client.
     - `init` has to be run only once. Subsequent runs can use `gce/up.sh` and `gce/down.sh` as it is.
-    - Please note that if `init` has been run on the same disk twice, the authentication will fail.
+    - Please note that if `init` has been run on the same disk more than once, the kubernetes API authentication with GCE instance will fail.
 - kubectl has been configured to work with the GCE instance by the above script, let's use it to wait until the node is ready
 - `watch -n1 kubectl get po --namespace=kube-system`
 - Wait until all five pods are ready
