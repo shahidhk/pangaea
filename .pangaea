@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # OPTIONS
-# PROVIDER={gce, vagrant}
-PROVIDER=gce
+# PROVIDER={gce, vagrant, azure}
+PROVIDER=azure
 
 # COREOS
 LOGROTATE_DOCKER=false
@@ -12,3 +12,7 @@ GCE_INSTANCE_NAME=testin
 GCE_DISK_MOUNTS=(
 #   diskname mountpath
 )
+
+# AZURE
+AZURE_NAME=aztest
+AZURE_LOCATION=eastasia

@@ -315,6 +315,16 @@ GCE_DISK_MOUNTS=(
 - `pangaea/gce/upgrade.sh`
 - This will reboot the instance
 
+## Step 5b: Move to Production on Azure
+
+- `azure config mode arm`
+- `azure login`
+- Optionally, `azure account set <id>`
+- `azure provider register Microsoft.Storage`
+- `azure provider register Microsoft.Network`
+- `azure provider register Microsoft.Compute`
+TODO: TODO
+
 ## Step 6: Helpful Scripts
 
 - Bash completion: source [this file](https://github.com/kubernetes/kubernetes/blob/master/contrib/completions/bash/kubectl)

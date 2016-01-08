@@ -10,3 +10,5 @@ pangaea/gce/.srl
 *.pyc
 
 pan.*
+
+.DS_Store
