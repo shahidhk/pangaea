@@ -5,8 +5,6 @@ set -e
 SCRIPT_DIR=`dirname $0`
 ROOT_DIR=$SCRIPT_DIR/../..
 
-COMMAND=$1
-
 source $ROOT_DIR/.pangaea
 
 gcloud compute instances delete "$GCE_INSTANCE_NAME" -q

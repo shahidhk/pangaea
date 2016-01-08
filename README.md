@@ -58,7 +58,7 @@ pangaea/bin/vagrant halt  # Bring down node
 
 In `.pangaea`  
 Set `PROVIDER=gce`  
-Set `GCE_INSTANCE_NAME` to the name of the compute resource you want to create
+Set `GCE_INSTANCE_NAME` to the name of the compute resource you want to create  
 Set `GCE_MACHINE_TYPE` to the required type, default is `n1-standard-1`
 
 ```bash
@@ -73,13 +73,12 @@ gcloud compute disks create disk-name --image coreos
 
 # Create an External IP address for the project
 gcloud compute addresses create ext-ip-address-name
-# Note down the name and ip address, to add it to .pangaea 
+# Note down the name, to add it to .pangaea 
 
 # Edit .pangaea to include these variables
 vim .pangaea
 # ...
 GCE_BOOT_DISK=disk-name
-GCE_EXT_IP=ext-ip-address
 GCE_EXT_IP_NAME=ext-ip-address-name
 # ...
 

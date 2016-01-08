@@ -31,7 +31,7 @@ function generate_gce_disk_args {
 }
 generate_gce_disk_args "${GCE_DISK_MOUNTS[@]}"
 
-GCE_BOOT_DISK_ARGS="--disk name=$GCE_BOOT_DISK,device-name=$GCE_BOOT_DISK,boot=yes,auto-delete=no,mode=rw"
+GCE_BOOT_DISK_ARGS="--disk name=$GCE_BOOT_DISK,boot=yes,auto-delete=no,mode=rw"
 
 gcloud compute instances create $GCE_INSTANCE_NAME \
 \
