@@ -255,8 +255,14 @@ In production we want to run fully self contained containers so that we have an 
 - Set settings in .pangaea
     - `PROVIDER=gce`
     - `GCE_INSTANCE_NAME` to the name of the compute instance we're going to create
+    - Create a boot disk and set `GCE_BOOT_DISK`
+    - Create an external IP address and set `GCE_EXT_IP_NAME`
 - Let's create the Kubernetes node, and open up a firewall port to the apiserver
-- `pangaea/gce/up.sh`
+- `pangaea/gce/up.sh init`
+- The `init` subcommand is important when it the first boot after the boot disk has been created.
+    - It creates the required certificates and keys and set them up both on server and client.
+    - `init` has to be run only once. Subsequent runs can use `gce/up.sh` and `gce/down.sh` as it is.
+    - Please note that if `init` has been run on the same disk more than once, the kubernetes API authentication with GCE instance will fail.
 - kubectl has been configured to work with the GCE instance by the above script, let's use it to wait until the node is ready
 - `watch -n1 kubectl get po --namespace=kube-system`
 - Wait until all five pods are ready
@@ -301,6 +307,32 @@ GCE_DISK_MOUNTS=(
 - If the instance already exists, attach the disks to the instance, otherwise they will be attached on create
 - `gcloud compute instances attach-disk name-of-instance --disk disk-name`
 - Create/upgrade the instance
+
+### Mounting GCE Boot disks
+
+A persistant disk can be used as the root filesystem so that the kubernetes state is preserved when the machine is restarted.
+
+- Create the GCE boot disk with a CoreOS image
+- `gcloud compute disks create disk-name --image coreos`
+- Edit .pangaea to include this boot disk in variable GCE_BOOT_DISK
+- vim .pangaea
+```shell
+# ...
+GCE_BOOT_DISK=disk-name
+# ...
+```
+- The disk will be mounted when `pangaea/gce/up.sh` is run and the machine boots from the disk.
+- When the VM is destroyed, the disk will be preserved
+
+### Creating Static External IP addresses
+
+Eventhough by default external IP addresses are created and attched to a VM when it is created, we can create and reserve and IP address for continous use and attach it any VM as we please.
+
+- Create the IP address
+- `gcloud compute addresses create ip-address-name`
+- Add this name to `.pangaea` so that `gce/up.sh` script can use it to attach to VM
+- Note that reserved, but unused IP addresses are charged by Google. So, make sure you delete them after use.
+- `gcloud compute addresses delete ip-address-name`
 
 ### Forward Docker and systemd Logs
 

@@ -8,7 +8,12 @@ PROVIDER=gce
 LOGROTATE_DOCKER=false
 
 # GCE
+# Required
 GCE_INSTANCE_NAME=testin
+GCE_MACHINE_TYPE=n1-standard-1
+GCE_BOOT_DISK=disk-name
+GCE_EXT_IP_NAME=ext-ip-address-name
+# Optional
 GCE_DISK_MOUNTS=(
 #   diskname mountpath
 )
