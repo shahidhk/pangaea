@@ -29,7 +29,32 @@ else
     echo "PAN: Using login keys found at $KEYS_PATH"
 fi
 
+# create azure resources
+
 azure group create -n "$AZURE_NAME" -l "$AZURE_LOCATION"
+
+# create network, lb, public ip, nic
+
+azure network vnet create --resource-group "$AZURE_NAME" --name "$AZURE_NAME-vnet" --location "$AZURE_LOCATION" --address-prefixes "10.240.0.0/24"
+azure network vnet subnet create --resource-group "$AZURE_NAME" --name "$AZURE_NAME-subnet" --vnet-name "$AZURE_NAME-vnet" --address-prefix "10.240.0.0/24"
+azure network public-ip create --resource-group "$AZURE_NAME" --name "$AZURE_NAME-pubip" --location "$AZURE_LOCATION" --allocation-method Static --domain-name-label "$AZURE_NAME-hasura"
+azure network lb create --resource-group "$AZURE_NAME" --name "$AZURE_NAME-lb" --location "$AZURE_LOCATION"
+azure network lb frontend-ip create --resource-group "$AZURE_NAME" --name "$AZURE_NAME-fip" --lb-name "$AZURE_NAME-lb" --public-ip-name "$AZURE_NAME-pubip"
+azure network lb address-pool create --resource-group "$AZURE_NAME" --name "$AZURE_NAME-bip" --lb-name "$AZURE_NAME-lb"
+azure network lb inbound-nat-rule create \
+    --resource-group "$AZURE_NAME" --name "$AZURE_NAME-nat-kubeapiserver" --lb-name "$AZURE_NAME-lb" \
+    --protocol tcp --frontend-port 8080 --backend-port
+
+# azure network lb address-pool show #
+
+# azure network nic create -g nrprg -n lb-nic1-be --subnet-name nrpvnetsubnet --subnet-vnet-name nrpvnet -d "/subscriptions/####################################/resourceGroups/nrprg/providers/Microsoft.Network/loadBalancers/nrplb/backendAddressPools/NRPbackendpool" -e "/subscriptions/####################################/resourceGroups/nrprg/providers/Microsoft.Network/loadBalancers/nrplb/inboundNatRules/rdp1" eastus
+azure network nic create \
+    --resource-group "$AZURE_NAME" --name "$AZURE_NAME-nic" \
+    --subnet-name "$AZURE_NAME-subnet" --subnet-vnet-name "$AZURE_NAME-vnet" \
+    --lb-address-pool-ids "/subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$AZURE_NAME/providers/Microsoft.Network/loadBalancers/$AZURE_NAME-lb/backendAddressPools/$AZURE_NAME-bip" \
+    --lb-inbound-nat-rule-ids "/subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$AZURE_NAME/providers/Microsoft.Network/loadBalancers/$AZURE_NAME-lb/inboundNatRules/$AZURE_NAME-nat-kubeapiserver" 
+
+# use nic here
 azure vm create \
     --resource-group "$AZURE_NAME" \
     --name "$AZURE_NAME-vm" \
@@ -49,7 +74,10 @@ azure vm create \
     --vnet-subnet-name "$AZURE_NAME-subnet" \
     --vnet-subnet-address-prefix "10.240.0.0/24" \
     --public-ip-name "$AZURE_NAME-pubip" \
-    --public-ip-domain-name "$AZURE_NAME-hasura" || true
+    --public-ip-domain-name "$AZURE_NAME-hasura" || true # TODO: remove true
+
+#TODO: rule add
+# XXX: azure network nic inbound-nat-rule add
 
 azure network public-ip show "$AZURE_NAME" "$AZURE_NAME-pubip" --json > "$CREATED_JSON"
 
