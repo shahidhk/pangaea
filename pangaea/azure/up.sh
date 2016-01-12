@@ -18,7 +18,7 @@ fi
 
 CLOUD_CONFIG=$ROOT_DIR/pangaea/kubernetes/cloud-config.sh
 
-CREATED_JSON=$ROOT_DIR/.tmp/azure_instance_create.json
+CREATED_JSON=$ROOT_DIR/.tmp/azure_public_ip.json
 
 KEYS_PATH=$ROOT_DIR/pangaea/pki/keys/$AZURE_NAME
 KEYS_FILE=$KEYS_PATH/login_key
@@ -29,11 +29,9 @@ else
     echo "PAN: Using login keys found at $KEYS_PATH"
 fi
 
-# create azure resources
+# PROVISION AZURE RESOURCES
 
 azure group create -n "$AZURE_NAME" -l "$AZURE_LOCATION"
-
-# create network, lb, public ip, nic
 
 azure network vnet create --resource-group "$AZURE_NAME" --name "$AZURE_NAME-vnet" --location "$AZURE_LOCATION" --address-prefixes "10.240.0.0/24"
 azure network vnet subnet create --resource-group "$AZURE_NAME" --name "$AZURE_NAME-subnet" --vnet-name "$AZURE_NAME-vnet" --address-prefix "10.240.0.0/24"
@@ -41,20 +39,12 @@ azure network public-ip create --resource-group "$AZURE_NAME" --name "$AZURE_NAM
 azure network lb create --resource-group "$AZURE_NAME" --name "$AZURE_NAME-lb" --location "$AZURE_LOCATION"
 azure network lb frontend-ip create --resource-group "$AZURE_NAME" --name "$AZURE_NAME-fip" --lb-name "$AZURE_NAME-lb" --public-ip-name "$AZURE_NAME-pubip"
 azure network lb address-pool create --resource-group "$AZURE_NAME" --name "$AZURE_NAME-bip" --lb-name "$AZURE_NAME-lb"
-azure network lb inbound-nat-rule create \
-    --resource-group "$AZURE_NAME" --name "$AZURE_NAME-nat-kubeapiserver" --lb-name "$AZURE_NAME-lb" \
-    --protocol tcp --frontend-port 8080 --backend-port
 
-# azure network lb address-pool show #
-
-# azure network nic create -g nrprg -n lb-nic1-be --subnet-name nrpvnetsubnet --subnet-vnet-name nrpvnet -d "/subscriptions/####################################/resourceGroups/nrprg/providers/Microsoft.Network/loadBalancers/nrplb/backendAddressPools/NRPbackendpool" -e "/subscriptions/####################################/resourceGroups/nrprg/providers/Microsoft.Network/loadBalancers/nrplb/inboundNatRules/rdp1" eastus
 azure network nic create \
-    --resource-group "$AZURE_NAME" --name "$AZURE_NAME-nic" \
+    --resource-group "$AZURE_NAME" --name "$AZURE_NAME-nic" --location "$AZURE_LOCATION" \
     --subnet-name "$AZURE_NAME-subnet" --subnet-vnet-name "$AZURE_NAME-vnet" \
-    --lb-address-pool-ids "/subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$AZURE_NAME/providers/Microsoft.Network/loadBalancers/$AZURE_NAME-lb/backendAddressPools/$AZURE_NAME-bip" \
-    --lb-inbound-nat-rule-ids "/subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$AZURE_NAME/providers/Microsoft.Network/loadBalancers/$AZURE_NAME-lb/inboundNatRules/$AZURE_NAME-nat-kubeapiserver" 
+    --lb-address-pool-ids "/subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$AZURE_NAME/providers/Microsoft.Network/loadBalancers/$AZURE_NAME-lb/backendAddressPools/$AZURE_NAME-bip"
 
-# use nic here
 azure vm create \
     --resource-group "$AZURE_NAME" \
     --name "$AZURE_NAME-vm" \
@@ -68,16 +58,15 @@ azure vm create \
     --admin-password "Password123!" \
     --ssh-publickey-file "$KEYS_PATH/login_key.pub" \
 \
-    --nic-name "$AZURE_NAME-nic" \
-    --vnet-name "$AZURE_NAME-vnet" \
-    --vnet-address-prefix "10.240.0.0/24" \
-    --vnet-subnet-name "$AZURE_NAME-subnet" \
-    --vnet-subnet-address-prefix "10.240.0.0/24" \
-    --public-ip-name "$AZURE_NAME-pubip" \
-    --public-ip-domain-name "$AZURE_NAME-hasura" || true # TODO: remove true
+    --nic-name "$AZURE_NAME-nic"
 
-#TODO: rule add
-# XXX: azure network nic inbound-nat-rule add
+# EXPOSE SSH AND KUBEAPISERVER
+
+NAT_SCRIPT=$ROOT_DIR/pangaea/azure/create-nat-rule.sh
+"$NAT_SCRIPT" 22 22 ssh
+"$NAT_SCRIPT" 443 443 kubeapiserver
+
+# BOOTSTRAP KUBERNETES
 
 azure network public-ip show "$AZURE_NAME" "$AZURE_NAME-pubip" --json > "$CREATED_JSON"
 
@@ -93,19 +82,13 @@ function init_ssl_and_setup_archive {
 }
 init_ssl_and_setup_archive
 
-exit
-
-# SET UP GCE KUBERNETES INSTANCE
-
-gcloud compute firewall-rules create "$GCE_INSTANCE_NAME-kubeapiserver-443" --allow tcp:443 --description "$GCE_INSTANCE_NAME: kubernetes api server secure port"
-
 "$ROOT_DIR/pangaea/bin/kubectl_setup"
 
 echo
 echo "###############################################"
 echo
 echo "The Kubernetes compute instance is now booting."
-echo "gcloud compute ssh core@$GCE_INSTANCE_NAME"
+echo "pangaea/azure/ssh.sh $NODE_IP"
 echo
 echo "###############################################"
 echo
