@@ -3,7 +3,7 @@
 set -e
 
 if [ ! "$#" = "3" ]; then
-    echo "USAGE: $0 <frontent-port> <backend-port> <name-for-nat-rule>"
+    echo "USAGE: $0 <frontend-port> <backend-port> <name-for-nat-rule>"
     exit 1
 fi
 

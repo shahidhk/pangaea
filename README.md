@@ -1,6 +1,6 @@
 # Pangaea
 
-Point and shoot Kubernetes. For Vagrant and GCE.
+Point and shoot Kubernetes. For Vagrant and GCE. And basic Azure.
 - To treat a Kubernetes cluster and Kubernetes nodes as the fundamental units of infrastructure, abstracting out the underlying provider
 - Enable excellent developer workflow
 
@@ -27,7 +27,8 @@ This document is meant to be used as a reference. For step by step instructions 
         `vagrant plugin install vagrant-vbox-snapshot`  
         `vagrant plugin install vagrant-triggers`
     - For GCE: gcloud, jq
-    - Recommended: kubectl binary [[linux](https://storage.googleapis.com/kubernetes-release/release/v1.1.2/bin/linux/amd64/kubectl)] [[mac](https://storage.googleapis.com/kubernetes-release/release/v1.1.2/bin/darwin/amd64/kubectl)]
+    - For Azure: azure-cli, jq
+    - kubectl binary [[linux](https://storage.googleapis.com/kubernetes-release/release/v1.1.2/bin/linux/amd64/kubectl)] [[mac](https://storage.googleapis.com/kubernetes-release/release/v1.1.2/bin/darwin/amd64/kubectl)]
 
 ## Usage
 
@@ -77,6 +78,32 @@ pangaea/gce/down.sh  # Destroys the compute instance, and deletes the firewall e
 ```
 
 Share the folder named after your instance under `pangaea/pki/keys` with your team and have them run `pangaea/bin/kubectl_setup` to config their workstation kubectl to work with the GCE instance.
+
+### Azure
+
+In `.pangaea`  
+Set `PROVIDER=azure`  
+Set `AZURE_NAME=<name of resources>`  
+Set `AZURE_LOCATION=<azure location>`
+
+```bash
+# First, set up Azure environment
+azure config mode arm
+azure login
+azure account set <id> # (Optionally set subscription)
+azure provider register Microsoft.Storage
+azure provider register Microsoft.Network
+azure provider register Microsoft.Compute
+
+pangaea/azure/up.sh  # Creates Azure based Kubernetes node
+# Provisions the node
+# Sets up NAT rules for ssh and kubeapiserver
+# Set up local kubectl to work with the Kubernetes node
+
+kubectl get po       # Working Kubernetes
+
+pangaea/azure/down.sh  # Destroys all associated Azure resources
+```
 
 ### Other Scripts
 

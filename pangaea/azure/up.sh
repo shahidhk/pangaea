@@ -58,7 +58,6 @@ azure vm create \
     --custom-data "$CLOUD_CONFIG" \
 \
     --admin-username core \
-    --admin-password "Password123!" \
     --ssh-publickey-file "$KEYS_PATH/login_key.pub" \
 \
     --nic-name "$AZURE_NAME-nic"
