@@ -81,7 +81,7 @@ function init_ssl_and_setup_archive {
 
     local SSH_RETRIES=0
 
-    while ! ssh -i "$KEYS_FILE" core@$NODE_IP date &>/dev/null; do
+    while ! ssh -o StrictHostKeyChecking=no -i "$KEYS_FILE" core@$NODE_IP date &>/dev/null; do
         if [ $SSH_RETRIES -gt 5 ]; then
             echo "SSH retries failed. Resources have been provisioned under group $AZURE_NAME"
             exit 1
@@ -90,8 +90,8 @@ function init_ssl_and_setup_archive {
         SSH_RETRIES=$((SSH_RETRIES+1))
     done
 
-    scp -i "$KEYS_FILE" "$SETUP_TAR" core@$NODE_IP:/tmp/setup.tar
-    scp -i "$KEYS_FILE" "$SETUP_MD5" core@$NODE_IP:/tmp/setup.md5
+    scp -o StrictHostKeyChecking=no -i "$KEYS_FILE" "$SETUP_TAR" core@$NODE_IP:/tmp/setup.tar
+    scp -o StrictHostKeyChecking=no -i "$KEYS_FILE" "$SETUP_MD5" core@$NODE_IP:/tmp/setup.md5
 }
 init_ssl_and_setup_archive
 

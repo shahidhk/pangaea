@@ -28,4 +28,4 @@ azure network lb inbound-nat-rule create \
 # Note: --name here is the NIC name, not a resource name
 azure network nic inbound-nat-rule add \
     --resource-group "$AZURE_NAME" --name "$AZURE_NAME-nic" --lb-name "$AZURE_NAME-lb" \
-    --inbound-nat-rule-name "$AZURE_NAME-nat-$3"
+    --lb-inbound-nat-rule-name "$AZURE_NAME-nat-$3"

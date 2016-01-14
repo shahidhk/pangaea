@@ -27,7 +27,7 @@ This document is meant to be used as a reference. For step by step instructions 
         `vagrant plugin install vagrant-vbox-snapshot`  
         `vagrant plugin install vagrant-triggers`
     - For GCE: gcloud, jq
-    - For Azure: azure-cli, jq
+    - For Azure: azure-cli (tested with 0.9.14), jq
     - kubectl binary [[linux](https://storage.googleapis.com/kubernetes-release/release/v1.1.2/bin/linux/amd64/kubectl)] [[mac](https://storage.googleapis.com/kubernetes-release/release/v1.1.2/bin/darwin/amd64/kubectl)]
 
 ## Usage
