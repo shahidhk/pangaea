@@ -18,7 +18,7 @@ SSL_TARBALL_PATH=$PKI_DIR/keys/$INSTANCE_NAME
 function init_ssl {
     local SSL_INIT_SCRIPT_PATH=$PKI_DIR/init-ssl
 
-    rm -rf "$SSL_TARBALL_PATH"
+    rm -rf "$SSL_TARBALL_PATH/*"
 
     mkdir -p "$SSL_TARBALL_PATH"
     "$SSL_INIT_SCRIPT_PATH" "$SSL_TARBALL_PATH" IP.1=10.3.0.1,IP.2=$NODE_IP,IP.3=127.0.0.1

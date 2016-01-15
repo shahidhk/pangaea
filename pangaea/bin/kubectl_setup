@@ -2,35 +2,31 @@
 
 set -e
 
-if [ "$1" = "-h" ]; then
-  echo "$0 [-h] [cached]"
-  echo "use the cached option to use the cached list of downloaded instances from gce"
-  exit 0
-fi
-
 SCRIPT_DIR=$(dirname "$0")
 
 source "$SCRIPT_DIR/pan_root" # set PAN_ROOT
 source "$PAN_ROOT/.pangaea"   # options
 
-LIST_JSON=$PAN_ROOT/.tmp/gce_instance_list.json
+LIST_JSON=$PAN_ROOT/.tmp/ip_information.json
 KUBE_NODE= # kubernetes apiserver
 KUBE_NAME= # name for kubectl setup
 
 function get_apiserver_ip() {
   if [ $PROVIDER = gce ]; then
-    if [ ! "$1" = "cached" ] || [ ! -e "$LIST_JSON" ]; then
-      gcloud compute instances list --format json > "$LIST_JSON"
-    fi
+    gcloud compute instances list --format json > "$LIST_JSON"
     KUBE_NODE=$(cat "$LIST_JSON" | jq -r '.[] | select(.name=="'"$GCE_INSTANCE_NAME"'").networkInterfaces[0].accessConfigs[0].natIP')
     KUBE_NODE=https://$KUBE_NODE
     KUBE_NAME=$GCE_INSTANCE_NAME
+  elif [ $PROVIDER = azure ]; then
+    azure network public-ip show "$AZURE_NAME" "$AZURE_NAME-pubip" --json > "$LIST_JSON"
+    KUBE_NODE=https://$(cat "$LIST_JSON" | jq -r '.ipAddress')
+    KUBE_NAME=$AZURE_NAME
   else
     KUBE_NODE=https://127.0.0.1:1443
     KUBE_NAME=vagrant
   fi
 }
-get_apiserver_ip "$1"
+get_apiserver_ip
 
 KUBE_PKI=$PAN_ROOT/pangaea/pki/keys/$KUBE_NAME
 

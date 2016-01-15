@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # OPTIONS
-# PROVIDER={gce, vagrant}
-PROVIDER=gce
+# PROVIDER={gce, vagrant, azure}
+PROVIDER=azure
 
 # COREOS
 LOGROTATE_DOCKER=false
@@ -17,3 +17,7 @@ GCE_EXT_IP_NAME=ext-ip-address-name
 GCE_DISK_MOUNTS=(
 #   diskname mountpath
 )
+
+# AZURE
+AZURE_NAME=at
+AZURE_LOCATION=eastasia

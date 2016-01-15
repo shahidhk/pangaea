@@ -347,6 +347,43 @@ Eventhough by default external IP addresses are created and attched to a VM when
 - `pangaea/gce/upgrade.sh`
 - This will reboot the instance
 
+## Step 5b: Move to Production on Azure
+
+- Read the GCE section for other helpful hints
+
+### Create the Production Instance
+
+- Set settings in .pangaea
+    - `PROVIDER=azure`
+    - `AZURE_NAME=<name of resources>`
+    - `AZURE_LOCATION=<azure location>`
+- `pangaea/azure/up.sh`
+    - Create Azure vm
+    - Create NAT rules for ssh and kubeapiserver
+
+### Share the Setup With Your Team
+
+- As with the GCE setup, pangaea/pki/keys/<AZURE_NAME> contains the credentials for kubectl
+- This directory also contains the ssh keys required to log in to the VM
+- Password based logins are disabled for Azure VMs
+
+### Open Additional NAT ports
+
+- `pangaea/azure/create-nat-rule.sh <frontend-port> <backend-port> <name-for-nat-rule>`
+- forwards traffic from frontend port on the public ip to the backend port
+
+### Expose Kubernetes Service
+
+- `pangaea/azure/kube-service-open.sh <service-name> <frontend-port>`
+- exposes the Kubernetes service named service-name on the public ip address at frontend-port
+- this uses the above NAT script, and uses the nodePort as the backend port
+
+### Misc
+
+- `azure network public-ip list <AZURE_NAME>` will list all public ip addresses. A single IP address should be present corresponding to the public ip address used by the load balancer.
+
+- `pangaea/azure/ssh.sh <public-ip>` will ssh into the VM using the ssh key in the credentials folder
+
 ## Step 6: Helpful Scripts
 
 - Bash completion: source [this file](https://github.com/kubernetes/kubernetes/blob/master/contrib/completions/bash/kubectl)
