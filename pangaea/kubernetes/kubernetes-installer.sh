@@ -205,11 +205,11 @@ spec:
     - --master=http://127.0.0.1:8080
     - --service-account-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem
     - --root-ca-file=/etc/kubernetes/ssl/ca.pem
-    $(if [ $PROVIDER = gce ]; then
-        cat << EOIF
+$(if [ $PROVIDER = gce ]; then
+    cat << EOIF
     - --cloud-provider=$PROVIDER
 EOIF
-    fi)
+fi)
     livenessProbe:
       httpGet:
         host: 127.0.0.1
