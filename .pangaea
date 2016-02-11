@@ -9,7 +9,7 @@ LOGROTATE_DOCKER=false
 
 # GCE
 # Required
-GCE_PROJECT_ID=hasura-portal
+GCE_PROJECT_ID=project-id
 GCE_INSTANCE_NAME=testin
 GCE_MACHINE_TYPE=n1-standard-1
 GCE_BOOT_DISK=disk-name
