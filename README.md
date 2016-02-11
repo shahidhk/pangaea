@@ -59,6 +59,7 @@ pangaea/bin/vagrant halt  # Bring down node
 
 In `.pangaea`  
 Set `PROVIDER=gce`  
+Ser `GCE_PROJECT_ID` to the Google Cloud Project ID that has to be used
 Set `GCE_INSTANCE_NAME` to the name of the compute resource you want to create  
 Set `GCE_MACHINE_TYPE` to the required type, default is `n1-standard-1`
 

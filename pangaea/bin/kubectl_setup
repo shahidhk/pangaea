@@ -13,7 +13,7 @@ KUBE_NAME= # name for kubectl setup
 
 function get_apiserver_ip() {
   if [ $PROVIDER = gce ]; then
-    gcloud compute instances list --format json > "$LIST_JSON"
+    gcloud --project $GCE_PROJECT_ID compute instances list --format json > "$LIST_JSON"
     KUBE_NODE=$(cat "$LIST_JSON" | jq -r '.[] | select(.name=="'"$GCE_INSTANCE_NAME"'").networkInterfaces[0].accessConfigs[0].natIP')
     KUBE_NODE=https://$KUBE_NODE
     KUBE_NAME=$GCE_INSTANCE_NAME
