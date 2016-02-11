@@ -22,23 +22,23 @@ fi
 
 CLOUD_CONFIG=$ROOT_DIR/pangaea/kubernetes/cloud-config.sh
 
-gcloud compute instances add-metadata $GCE_INSTANCE_NAME \
+gcloud --project $GCE_PROJECT_ID compute instances add-metadata $GCE_INSTANCE_NAME \
     --metadata-from-file user-data="$CLOUD_CONFIG"
 
 # cloud config will recreate the setup directory from the new bootstrap scripts
 
-gcloud compute ssh core@$GCE_INSTANCE_NAME --command 'sudo rm -rf /tmp/setup.tar /opt/panwd/setup'
+gcloud --project $GCE_PROJECT_ID compute ssh core@$GCE_INSTANCE_NAME --command 'sudo rm -rf /tmp/setup.tar /opt/panwd/setup'
 
 SETUP_TAR=$ROOT_DIR/.tmp/setup.tar # written to by init script
 SETUP_MD5=$ROOT_DIR/.tmp/setup.md5
 
 # reboot to reconfigure
 
-gcloud compute ssh core@$GCE_INSTANCE_NAME --command 'sudo reboot' || true
+gcloud --project $GCE_PROJECT_ID compute ssh core@$GCE_INSTANCE_NAME --command 'sudo reboot' || true
 
-while ! gcloud compute ssh core@$GCE_INSTANCE_NAME --command 'date' &>/dev/null; do
+while ! gcloud --project $GCE_PROJECT_ID compute ssh core@$GCE_INSTANCE_NAME --command 'date' &>/dev/null; do
     sleep 2
 done
 
-gcloud compute copy-files "$SETUP_TAR" "$GCE_INSTANCE_NAME:/tmp/setup.tar"
-gcloud compute copy-files "$SETUP_MD5" "$GCE_INSTANCE_NAME:/tmp/setup.md5"
+gcloud --project $GCE_PROJECT_ID compute copy-files "$SETUP_TAR" "$GCE_INSTANCE_NAME:/tmp/setup.tar"
+gcloud --project $GCE_PROJECT_ID compute copy-files "$SETUP_MD5" "$GCE_INSTANCE_NAME:/tmp/setup.md5"

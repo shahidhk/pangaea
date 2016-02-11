@@ -33,7 +33,7 @@ generate_gce_disk_args "${GCE_DISK_MOUNTS[@]}"
 
 GCE_BOOT_DISK_ARGS="--disk name=$GCE_BOOT_DISK,boot=yes,auto-delete=no,mode=rw"
 
-gcloud compute instances create $GCE_INSTANCE_NAME \
+gcloud --project $GCE_PROJECT_ID compute instances create $GCE_INSTANCE_NAME \
 \
     --machine-type $GCE_MACHINE_TYPE\
     $GCE_BOOT_DISK_ARGS \
@@ -52,16 +52,16 @@ function init_ssl_and_setup_archive {
     local SETUP_MD5=$ROOT_DIR/.tmp/setup.md5
     "$ROOT_DIR/pangaea/setup/init_ssl_and_setup_archive.sh" create $GCE_INSTANCE_NAME $NODE_IP
 
-    gcloud compute copy-files "$SETUP_TAR" "core@$GCE_INSTANCE_NAME:/tmp/setup.tar"
-    gcloud compute copy-files "$SETUP_MD5" "core@$GCE_INSTANCE_NAME:/tmp/setup.md5"
+    gcloud --project $GCE_PROJECT_ID compute copy-files "$SETUP_TAR" "core@$GCE_INSTANCE_NAME:/tmp/setup.tar"
+    gcloud --project $GCE_PROJECT_ID compute copy-files "$SETUP_MD5" "core@$GCE_INSTANCE_NAME:/tmp/setup.md5"
 }
 
 SSH_RETRIES=0
 
-while ! gcloud compute ssh core@$GCE_INSTANCE_NAME --command 'date' &>/dev/null; do
+while ! gcloud --project $GCE_PROJECT_ID compute ssh core@$GCE_INSTANCE_NAME --command 'date' &>/dev/null; do
     if [ $SSH_RETRIES -gt 5 ]; then
         echo 'SSH retries failed. Error occured within VM. Deleting VM and exiting'
-        gcloud compute instances delete $GCE_INSTANCE_NAME -q
+        gcloud --project $GCE_PROJECT_ID compute instances delete $GCE_INSTANCE_NAME -q
         exit
     fi  
     sleep 10
@@ -73,7 +73,7 @@ if [ "$COMMAND" = "init" ]; then
     init_ssl_and_setup_archive
 fi
 
-gcloud compute firewall-rules create "$GCE_INSTANCE_NAME-kubeapiserver-443" --allow tcp:443 --description "$GCE_INSTANCE_NAME: kubernetes api server secure port"
+gcloud --project $GCE_PROJECT_ID compute firewall-rules create "$GCE_INSTANCE_NAME-kubeapiserver-443" --allow tcp:443 --description "$GCE_INSTANCE_NAME: kubernetes api server secure port"
 
 "$ROOT_DIR/pangaea/bin/kubectl_setup"
 
@@ -81,7 +81,7 @@ echo
 echo "###############################################"
 echo
 echo "The Kubernetes compute instance is now booting."
-echo "gcloud compute ssh core@$GCE_INSTANCE_NAME"
+echo "gcloud --project $GCE_PROJECT_ID compute ssh core@$GCE_INSTANCE_NAME"
 echo "External IP address is $NODE_IP"
 echo
 echo "###############################################"

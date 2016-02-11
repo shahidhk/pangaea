@@ -9,7 +9,7 @@ source "$ROOT_DIR/.pangaea"
 
 function disks_create {
     while [ ! $# -eq 0 ]; do
-        gcloud compute disks delete $1 -q
+        gcloud --project $GCE_PROJECT_ID compute disks delete $1 -q
         shift 2
     done
 }
