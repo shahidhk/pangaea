@@ -22,6 +22,7 @@ See the [README](README.md) for a super brief summary instead.
   - Mounting GCE disks
   - Forward Docker and systemd Logs
   - Upgrading Pangaea
+- Step 5b: Move to Production on Azure
 - Step 6: Helpful Scripts
 - Further Study
 
@@ -254,6 +255,7 @@ In production we want to run fully self contained containers so that we have an 
 
 - Set settings in .pangaea
     - `PROVIDER=gce`
+    - `GCE_PROJECT_ID` to the Google Cloud Project ID to be used for creating VM
     - `GCE_INSTANCE_NAME` to the name of the compute instance we're going to create
     - Create a boot disk and set `GCE_BOOT_DISK`
     - Create an external IP address and set `GCE_EXT_IP_NAME`
