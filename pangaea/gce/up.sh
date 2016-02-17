@@ -31,18 +31,26 @@ function generate_gce_disk_args {
 }
 generate_gce_disk_args "${GCE_DISK_MOUNTS[@]}"
 
-GCE_BOOT_DISK_ARGS="--disk name=$GCE_BOOT_DISK,boot=yes,auto-delete=no,mode=rw"
+if [ -n "$GCE_BOOT_DISK" ]; then
+    GCE_BOOT_DISK_ARGS="--disk name=$GCE_BOOT_DISK,boot=yes,auto-delete=no,mode=rw"
+else
+    GCE_BOOT_DISK_ARGS="--boot-disk-size 20GB --boot-disk-type pd-ssd --image coreos"
+fi
+
+GCE_EXT_IP_ARGS=""
+if [ -n "$GCE_EXT_IP_NAME" ]; then
+    GCE_EXT_IP_ARGS="--address $GCE_EXT_IP_NAME"
+fi
 
 gcloud --project $GCE_PROJECT_ID compute instances create $GCE_INSTANCE_NAME \
 \
     --machine-type $GCE_MACHINE_TYPE\
     $GCE_BOOT_DISK_ARGS \
     $GCE_DISK_ARGS \
-    --address $GCE_EXT_IP_NAME \
+    $GCE_EXT_IP_ARGS \
     --metadata-from-file user-data="$CLOUD_CONFIG" \
     --scopes https://www.googleapis.com/auth/cloud.useraccounts.readonly,https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/compute \
     --format json > "$CREATED_JSON"
-
 
 NODE_IP=$(cat "$CREATED_JSON" | jq -r '.[0].networkInterfaces[0].accessConfigs[0].natIP')
 
