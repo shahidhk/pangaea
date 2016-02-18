@@ -12,9 +12,9 @@ LOGROTATE_DOCKER=false
 GCE_PROJECT_ID=project-id
 GCE_INSTANCE_NAME=testin
 GCE_MACHINE_TYPE=n1-standard-1
+# Optional
 GCE_BOOT_DISK=disk-name
 GCE_EXT_IP_NAME=ext-ip-address-name
-# Optional
 GCE_DISK_MOUNTS=(
 #   diskname mountpath
 )
